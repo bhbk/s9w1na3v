@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9DA9F5E3-ADB1-47FE-8E14-003663EF76A8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Bmon.Client.Core</RootNamespace>
+    <AssemblyName>Bmon.Client.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Echo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Statics.cs" />
+    <Compile Include="v1_0_0_0\Read.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bmon.Client.Lib.Conf\Bmon.Client.Lib.Conf.csproj">
+      <Project>{710a3081-bea6-462f-8460-baeab2169d2f}</Project>
+      <Name>Bmon.Client.Lib.Conf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bmon.Client.Lib.Devour\Bmon.Client.Lib.Devour.csproj">
+      <Project>{a5648df2-b959-4cc9-9c29-5764d3e070b3}</Project>
+      <Name>Bmon.Client.Lib.Devour</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bmon.Client.Lib.Echo\Bmon.Client.Lib.Echo.csproj">
+      <Project>{24d7e9a8-5380-4bc5-9e45-974a71b9cae4}</Project>
+      <Name>Bmon.Client.Lib.Echo</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bmon.Client.Lib.Models\Bmon.Client.Lib.Models.csproj">
+      <Project>{1d20bba3-f904-4e88-bd05-a4063eb9ab1d}</Project>
+      <Name>Bmon.Client.Lib.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bmon.Client.Lib.Transport\Bmon.Client.Lib.Transport.csproj">
+      <Project>{3074d765-fe85-48d9-b97f-c10905a6ea5c}</Project>
+      <Name>Bmon.Client.Lib.Transport</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
