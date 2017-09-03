@@ -15,7 +15,7 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Bmon.Client.Setup.x64", "Bm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bmon.Client.Lib.Devour", "Bmon.Client.Lib.Devour\Bmon.Client.Lib.Devour.csproj", "{A5648DF2-B959-4CC9-9C29-5764D3E070B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bmon.Client.Lib.Conf", "Bmon.Client.Lib.Conf\Bmon.Client.Lib.Conf.csproj", "{710A3081-BEA6-462F-8460-BAEAB2169D2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bmon.Client.Lib.Config", "Bmon.Client.Lib.Config\Bmon.Client.Lib.Config.csproj", "{710A3081-BEA6-462F-8460-BAEAB2169D2F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bmon.Client.Lib.Echo", "Bmon.Client.Lib.Echo\Bmon.Client.Lib.Echo.csproj", "{24D7E9A8-5380-4BC5-9E45-974A71B9CAE4}"
 EndProject

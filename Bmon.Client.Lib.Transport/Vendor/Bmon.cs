@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bmon.Client.Core.v1_0_0_0
+namespace Bmon.Client.Lib.Transport.Vendor
 {
-    public static class Read
+    public class Bmon
     {
     }
 }

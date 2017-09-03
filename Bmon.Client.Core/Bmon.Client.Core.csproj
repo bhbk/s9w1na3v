@@ -45,9 +45,9 @@
     <Compile Include="v1_0_0_0\Read.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bmon.Client.Lib.Conf\Bmon.Client.Lib.Conf.csproj">
+    <ProjectReference Include="..\Bmon.Client.Lib.Config\Bmon.Client.Lib.Config.csproj">
       <Project>{710a3081-bea6-462f-8460-baeab2169d2f}</Project>
-      <Name>Bmon.Client.Lib.Conf</Name>
+      <Name>Bmon.Client.Lib.Config</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bmon.Client.Lib.Devour\Bmon.Client.Lib.Devour.csproj">
       <Project>{a5648df2-b959-4cc9-9c29-5764d3e070b3}</Project>

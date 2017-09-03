@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bmon.Client.Lib.Conf
+namespace Bmon.Client.Lib.Conf.v1_0_0_0
 {
-    public class Class1
+    public static class Read
     {
     }
 }
