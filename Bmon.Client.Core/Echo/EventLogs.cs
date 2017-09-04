@@ -2,11 +2,11 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace Bmon.Client.Lib.Echo
+namespace Bmon.Client.Core.Echo
 {
-    public class EventLogs
+    internal class EventLogs
     {
-        public static void write(String executingassembly, String method, String msg, EventLogEntryType level)
+        internal static void write(String executingassembly, String method, String msg, EventLogEntryType level)
         {
             EventLog evtLog = new EventLog("Application", ".", executingassembly);
             StringBuilder evtEntry = new StringBuilder(executingassembly);
@@ -15,7 +15,7 @@ namespace Bmon.Client.Lib.Echo
             evtLog.WriteEntry(evtEntry.ToString(), level);
             evtLog.Close();
         }
-        public static void write(String appdomain, String executingassembly, String method, String msg, EventLogEntryType level)
+        internal static void Record(String appdomain, String executingassembly, String method, String msg, EventLogEntryType level)
         {
             EventLog evtLog = new EventLog("Application", ".", appdomain);
             StringBuilder evtEntry = new StringBuilder(appdomain);
@@ -25,7 +25,7 @@ namespace Bmon.Client.Lib.Echo
             evtLog.WriteEntry(evtEntry.ToString(), level);
             evtLog.Close();
         }
-        public static void write(String executingassembly, String method, Exception ex)
+        internal static void write(String executingassembly, String method, Exception ex)
         {
             EventLog evtLog = new EventLog("Application", ".", executingassembly);
             StringBuilder evtEntry = new StringBuilder(executingassembly);
@@ -36,7 +36,7 @@ namespace Bmon.Client.Lib.Echo
             evtLog.Close();
         }
 
-        public static void write(String appdomain, String executingassembly, String method, Exception ex)
+        internal static void write(String appdomain, String executingassembly, String method, Exception ex)
         {
             EventLog evtLog = new EventLog("Application", ".", appdomain);
             StringBuilder evtEntry = new StringBuilder(appdomain);
@@ -48,7 +48,7 @@ namespace Bmon.Client.Lib.Echo
             evtLog.Close();
         }
 
-        public static void write(String appdomain, String entryassembly, String callingassembly, String executingassembly, String method, Exception ex)
+        internal static void write(String appdomain, String entryassembly, String callingassembly, String executingassembly, String method, Exception ex)
         {
             EventLog evtLog = new EventLog("Application", ".", appdomain);
             StringBuilder evtEntry = new StringBuilder(appdomain);

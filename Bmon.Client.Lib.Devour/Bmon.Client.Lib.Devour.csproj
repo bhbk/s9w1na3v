@@ -46,7 +46,8 @@
   <ItemGroup>
     <Compile Include="DotCsv\GenericFormatA.cs" />
     <Compile Include="DotCsv\VendorAFormatA.cs" />
-    <Compile Include="DotCsv\VendorBFormatA.cs" />
+    <Compile Include="DotXml\VendorAFormatA.cs" />
+    <Compile Include="DotXml\GenericFormatA.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Statics.cs" />
   </ItemGroup>

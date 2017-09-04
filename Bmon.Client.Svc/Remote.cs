@@ -57,11 +57,11 @@ namespace Bmon.Client.Svc
                     rslt.Append(Environment.NewLine + "channel URI is " + channelUri);
                 }
 
-                Bmon.Client.Core.Echo.Audit.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), rslt, Bmon.Client.Core.Echo.levels.debug);
+                Bmon.Client.Core.Echo.Proxy.Audit.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), rslt, Bmon.Client.Core.Echo.Proxy.levels.debug);
             }
             catch (Exception ex)
             {
-                Bmon.Client.Core.Echo.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
+                Bmon.Client.Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
             }
         }
     }

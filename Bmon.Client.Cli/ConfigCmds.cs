@@ -1,18 +1,19 @@
 ﻿using ManyConsole;
 using System;
+using System.Reflection;
 
 namespace Bmon.Client.Cli
 {
     public class ConfigCmds : ConsoleCommand
     {
-        public string ConfFile { get; set; }
+        private string confFile { get; set; }
 
         public ConfigCmds()
         {
             IsCommand("config", "Do configuration things...");
 
-            HasOption("s|show=", "Show a configuration.", s => ConfFile = s);
-            HasOption("v|validate=", "Validate a configuration.", v => ConfFile = v);
+            HasOption("s|show=", "Show a configuration.", s => confFile = s);
+            HasOption("v|validate=", "Validate a configuration.", v => confFile = v);
             HasAdditionalArguments(1, "<file>");
         }
 
@@ -20,12 +21,11 @@ namespace Bmon.Client.Cli
         {
             try
             {
-                return (int)ExitCodes.Success;
+                return Helpers.FondFarewell();
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                Bmon.Client.Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
 
                 return (int)ExitCodes.Exception;
             }

@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace Bmon.Client.Core
+namespace Bmon.Client.Core.Echo
 {
-    public class Echo
+    public class Proxy
     {
         [Flags]
         public enum levels
@@ -23,16 +23,16 @@ namespace Bmon.Client.Core
                 switch (lvl)
                 {
                     case levels.debug:
-                        Bmon.Client.Lib.Echo.EventLogs.write(Bmon.Client.Core.Statics.ConfEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
+                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
                         break;
                     case levels.info:
-                        Bmon.Client.Lib.Echo.EventLogs.write(Bmon.Client.Core.Statics.ConfEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
+                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
                         break;
                     case levels.audit_fail:
-                        Bmon.Client.Lib.Echo.EventLogs.write(Bmon.Client.Core.Statics.ConfEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.FailureAudit);
+                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.FailureAudit);
                         break;
                     case levels.audit_success:
-                        Bmon.Client.Lib.Echo.EventLogs.write(Bmon.Client.Core.Statics.ConfEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.SuccessAudit);
+                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.SuccessAudit);
                         break;
                     case levels.none:
                         break;
@@ -46,7 +46,7 @@ namespace Bmon.Client.Core
         {
             public static void Msg(String executingassembly, String method, Exception ex)
             {
-                Bmon.Client.Lib.Echo.EventLogs.write(Bmon.Client.Core.Statics.ConfEventLogSource, executingassembly, method, ex);
+                Bmon.Client.Core.Echo.EventLogs.write(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, ex);
             }
         }
     }
