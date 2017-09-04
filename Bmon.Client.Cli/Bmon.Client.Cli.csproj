@@ -46,6 +46,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -62,7 +63,7 @@
   <ItemGroup>
     <Compile Include="ConfigCmds.cs" />
     <Compile Include="DevourCmds.cs" />
-    <Compile Include="Globals.cs" />
+    <Compile Include="Statics.cs" />
     <Compile Include="UploadCmds.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -75,6 +76,18 @@
     <ProjectReference Include="..\Bmon.Client.Core\Bmon.Client.Core.csproj">
       <Project>{9da9f5e3-adb1-47fe-8e14-003663ef76a8}</Project>
       <Name>Bmon.Client.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bmon.Client.Lib.Devour\Bmon.Client.Lib.Devour.csproj">
+      <Project>{a5648df2-b959-4cc9-9c29-5764d3e070b3}</Project>
+      <Name>Bmon.Client.Lib.Devour</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bmon.Client.Lib.Models\Bmon.Client.Lib.Models.csproj">
+      <Project>{1d20bba3-f904-4e88-bd05-a4063eb9ab1d}</Project>
+      <Name>Bmon.Client.Lib.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bmon.Client.Lib.Transport\Bmon.Client.Lib.Transport.csproj">
+      <Project>{3074d765-fe85-48d9-b97f-c10905a6ea5c}</Project>
+      <Name>Bmon.Client.Lib.Transport</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bmon.Client.Svc.Proxy\Bmon.Client.Svc.Proxy.csproj">
       <Project>{b5b6cb8e-7d0f-472f-bdfc-4ba3ac5abcfc}</Project>

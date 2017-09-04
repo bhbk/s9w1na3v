@@ -3,13 +3,28 @@ using System.Collections.Generic;
 
 namespace Bmon.Client.Lib.Models
 {
-    public class Bmon
+    [Serializable]
+    public class BmonTrendsForPost
     {
-        [Serializable]
-        public class HttpPost
+        public string StoreKey { get; set; }
+        public List<Tuple<double, string, double>> Readings { get; set; }
+
+        public BmonTrendsForPost()
         {
-            public string storeKey { get; set; }
-            public List<List<object>> readings { get; set; }
+            StoreKey = string.Empty;
+            Readings = new List<Tuple<double, string, double>>();
+        }
+
+        public BmonTrendsForPost(string storeKey)
+        {
+            StoreKey = storeKey;
+            Readings = new List<Tuple<double, string, double>>();
+        }
+
+        public BmonTrendsForPost(string storeKey, List<Tuple<double, string, double>> readings)
+        {
+            StoreKey = storeKey;
+            Readings = readings;
         }
     }
 }

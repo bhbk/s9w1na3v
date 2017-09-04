@@ -24,16 +24,16 @@ namespace Bmon.Client.Lib.Transport.Generic
             session = new SftpClient(info);
         }
 
-        public Sftp(Uri host, int port, string username, string file, string passphrase)
+        public Sftp(Uri host, int port, string userName, string filePathAndName, string passPhrase)
         {
             //use key authentication (using keys in openssh Format)
-            using (var fs = File.OpenRead(file))
+            using (var fs = File.OpenRead(filePathAndName))
             {
-                info = new ConnectionInfo(host.DnsSafeHost, port, username,
+                info = new ConnectionInfo(host.DnsSafeHost, port, userName,
                     new AuthenticationMethod[]{
-                        new PrivateKeyAuthenticationMethod(username, new PrivateKeyFile[]
+                        new PrivateKeyAuthenticationMethod(userName, new PrivateKeyFile[]
                         {
-                            new PrivateKeyFile(fs, passphrase) 
+                            new PrivateKeyFile(fs, passPhrase) 
                         }),
                     });
 
@@ -64,9 +64,9 @@ namespace Bmon.Client.Lib.Transport.Generic
             }
         }
 
-
         public void DownloadFile(string remotePath, string remoteFile, string localPath, string localFile, FileAction action)
         {
+            //make this async in future...
             try
             {
                 session.Connect();
@@ -94,6 +94,7 @@ namespace Bmon.Client.Lib.Transport.Generic
 
         public void UploadFile(string localPath, string localFile, string remotePath, string remoteFile, FileAction action)
         {
+            //make this async in the future...
             try
             {
                 session.Connect();

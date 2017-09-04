@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace Bmon.Client.Lib.Transport
 {
@@ -13,8 +10,8 @@ namespace Bmon.Client.Lib.Transport
         OverwriteIfExist
     }
     
-    public class Globals
+    internal static class Statics
     {
-
+        internal static readonly bool ConfDebug = Boolean.Parse(ConfigurationManager.AppSettings["Debug"]);
     }
 }
