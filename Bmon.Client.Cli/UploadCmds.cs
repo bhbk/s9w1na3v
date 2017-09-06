@@ -10,29 +10,47 @@ namespace Bmon.Client.Cli
 {
     public class UploadCmds : ConsoleCommand
     {
-        private string file;
-        private string fileFormat;
-        private UploadTypes uploadType;
+        private UploadTypes upload;
+        private string file = null, format = null;
 
         public UploadCmds()
         {
             IsCommand("upload", "Do upload things...");
-            //HasRequiredOption("ut|upload-type=", "Method for uploading data.", ut => uploadType = ut);
-            HasRequiredOption("f|file=", "File that contains trending data.", f => file = f);
-            HasRequiredOption("ff|file-format=", "File format for the trending data.", ff => fileFormat = ff);
-            HasAdditionalArguments(1, "<type>");
+            HasRequiredOption("f|file=", "File to parse. File must exist.", arg =>
+            {
+                Helpers.FileSanityChecks(ref arg, ref file);
+            });
+            HasRequiredOption("u|upload=", "Type of upload to perform.", arg =>
+            {
+                if (arg == UploadTypes.FileToDropbox.ToString())
+                    upload = UploadTypes.FileToDropbox;
+
+                else if (arg == UploadTypes.FileViaFtp.ToString())
+                    upload = UploadTypes.FileViaFtp;
+
+                else if (arg == UploadTypes.FileViaSftp.ToString())
+                    upload = UploadTypes.FileViaSftp;
+
+                else if (arg == UploadTypes.FileViaTftp.ToString())
+                    upload = UploadTypes.FileViaTftp;
+
+                else if (arg == UploadTypes.WebApiToBmon.ToString())
+                    upload = UploadTypes.WebApiToBmon;
+
+                else
+                    throw new ConsoleHelpAsException("Invalid upload type given...");
+            });
         }
 
         public override int Run(string[] remainingArguments)
         {
             try
             {
-                Helpers.FileSanityChecks(ref file);
                 string localPath = new FileInfo(file).DirectoryName;
                 string localName = new FileInfo(file).Name;
                 string remoteName = localName;
 
-                switch (uploadType)
+                switch (upload)
                 {
                     case UploadTypes.FileToDropbox:
                         {
@@ -67,7 +85,8 @@ namespace Bmon.Client.Cli
                     case UploadTypes.WebApiToBmon:
                         {
                             Lib.Devour.DotCsv.GenericFormatA csv = new Lib.Devour.DotCsv.GenericFormatA(file);
-                            Lib.Models.BmonPostTrendMultiple trends = csv.ParseTrends();
+                            Lib.Models.BmonPostTrendMultiple trends = new BmonPostTrendMultiple();
+                            csv.Parse(ref trends);
                             
                             Lib.Transport.Vendor.Bmon bmonApi = new Lib.Transport.Vendor.Bmon(Core.Config.v1_0_0_0.MyBmonHost);
                             bmonApi.PostAsync(Core.Config.v1_0_0_0.MyBmonPostPath, trends);
@@ -83,8 +102,7 @@ namespace Bmon.Client.Cli
             catch (Exception ex)
             {
                 Bmon.Client.Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
-
-                return (int)ExitCodes.Exception;
+                return Helpers.AngryFarewell(ex);
             }
         }
     }

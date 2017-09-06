@@ -1,32 +1,41 @@
-﻿using System;
+﻿using ManyConsole;
+using System;
 using System.IO;
 
 namespace Bmon.Client.Cli
 {
     internal class Helpers
     {
-        internal static int FileSanityChecks(ref string file)
+        internal static void FileSanityChecks(ref string arg, ref string file)
         {
-            if (file == null)
-                file = Core.Config.v1_0_0_0.CsvGenericFormatA;
+            if (arg == string.Empty)
+                throw new ConsoleHelpAsException(string.Format("No file name was given.", arg));
 
-            if (!File.Exists(file))
-            {
-                Console.WriteLine(string.Format("The file {0} does not exist.", file));
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
-                return (int)ExitCodes.Failure;
-            }
+            else if (!File.Exists(arg))
+                throw new ConsoleHelpAsException(string.Format("The file {0} does not exist.", arg));
 
-            return (int)ExitCodes.Success;
+            else
+                file = arg;
         }
 
         internal static int FondFarewell()
         {
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            //Console.Error.WriteLine();
+            //Console.WriteLine("Press any key to exit...");
+            //Console.ReadKey();
 
             return (int)ExitCodes.Success;
+        }
+
+        internal static int AngryFarewell(Exception ex)
+        {
+            Console.Error.WriteLine(ex.Message);
+            Console.Error.WriteLine(ex.StackTrace);
+            //Console.Error.WriteLine();
+            //Console.Error.WriteLine("Press any key to exit...");
+            //Console.ReadKey();
+
+            return (int)ExitCodes.Exception;
         }
     }
 }

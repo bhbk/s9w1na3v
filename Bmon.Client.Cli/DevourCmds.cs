@@ -8,33 +8,56 @@ namespace Bmon.Client.Cli
 {
     public class DevourCmds : ConsoleCommand
     {
-        private string file;
+        private string file = null;
+        private bool validate = false, guess = false, show = false;
 
         public DevourCmds()
         {
-            IsCommand("devour", "Do consumption of things...");
+            IsCommand("devour", "Do things with a trend file...");
 
-            HasOption("s|show=", "Show the tranding information.", s => file = s);
-            HasOption("v|validate=", "Validate the format of the trending information.", v => file = v);
-            HasAdditionalArguments(1, "<type>");
+            HasRequiredOption("f|file=", "File to parse. File must exist.", arg =>
+            {
+                Helpers.FileSanityChecks(ref arg, ref file);
+            });
+            HasOption("g|guess", "Guess file format.", arg => { guess = true; });
+            HasOption("v|validate", "Validate file.", arg => { validate = true; });
+            HasOption("s|show", "Show parsed trend data.", arg => { show = true; });
         }
 
         public override int Run(string[] remainingArguments)
         {
             try
             {
-                Helpers.FileSanityChecks(ref file);
-
                 Lib.Devour.DotCsv.GenericFormatA csv = new Lib.Devour.DotCsv.GenericFormatA(file);
-                Lib.Models.BmonPostTrendMultiple trends = csv.ParseTrends();
+                Lib.Models.BmonPostTrendMultiple trends = new Lib.Models.BmonPostTrendMultiple();
+
+                if (guess)
+                {
+
+                }
+
+                if (show)
+                {
+                    csv.Parse(ref trends);
+                    Console.WriteLine(trends.ToString());
+                }
+
+                if (validate)
+                {
+                    csv.debug = false;
+
+                    if (csv.TryParse(ref trends))
+                        Console.WriteLine("File has a valid format.");
+                    else
+                        Console.WriteLine("File has an invalid format.");
+                }
 
                 return Helpers.FondFarewell();
             }
             catch (Exception ex)
             {
                 Bmon.Client.Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
-
-                return (int)ExitCodes.Exception;
+                return Helpers.AngryFarewell(ex);
             }
         }
     }
