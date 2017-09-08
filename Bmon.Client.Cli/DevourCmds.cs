@@ -1,15 +1,17 @@
-﻿using Bmon.Client;
+﻿using Bmon.Client.Lib.Devour;
 using ManyConsole;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
-using System.IO;
 
 namespace Bmon.Client.Cli
 {
     public class DevourCmds : ConsoleCommand
     {
+        private OutputFormat format;
         private string file = null;
-        private bool validate = false, guess = false, show = false;
+        private bool validate = false, show = false;
 
         public DevourCmds()
         {
@@ -19,34 +21,66 @@ namespace Bmon.Client.Cli
             {
                 Helpers.FileSanityChecks(ref arg, ref file);
             });
-            HasOption("g|guess", "Guess file format.", arg => { guess = true; });
+            HasOption("s|show", "Show parsed information.", arg => { show = true; });
+            HasOption("o|output-format=", "Show output format.", arg => 
+            {
+                if (show)
+                {
+                    if (arg == OutputFormat.Csv.ToString())
+                        format = OutputFormat.Csv;
+
+                    else if (arg == OutputFormat.Json.ToString())
+                        format = OutputFormat.Json;
+
+                    else
+                        throw new ConsoleHelpAsException("Invalid output format...");
+                }
+                else
+                    throw new ConsoleHelpAsException("Invalid use of output-format...");
+            });
             HasOption("v|validate", "Validate file.", arg => { validate = true; });
-            HasOption("s|show", "Show parsed trend data.", arg => { show = true; });
         }
 
         public override int Run(string[] remainingArguments)
         {
             try
             {
-                Lib.Devour.DotCsv.GenericFormatA csv = new Lib.Devour.DotCsv.GenericFormatA(file);
-                Lib.Models.BmonPostTrendMultiple trends = new Lib.Models.BmonPostTrendMultiple();
-
-                if (guess)
-                {
-
-                }
+                Lib.Devour.DotCsv.GenericFormatA raw = new Lib.Devour.DotCsv.GenericFormatA(file);
+                Lib.Models.MultipleMomentsTuples momentsTuples = new Lib.Models.MultipleMomentsTuples();
+                Lib.Models.MultipleMomentsArrays momentsArrays = new Lib.Models.MultipleMomentsArrays();
 
                 if (show)
                 {
-                    csv.Parse(ref trends);
-                    Console.WriteLine(trends.ToString());
+                    raw.Parse(ref momentsTuples);
+                    Console.WriteLine(raw.Stdout);
+
+                    foreach (Tuple<double, string, double> t in momentsTuples.Readings)
+                        momentsArrays.Readings.Add(new List<string>() { t.Item1.ToString(), t.Item2.ToString(), t.Item3.ToString() });
+
+                    switch (format)
+                    {
+                        case OutputFormat.Csv:
+                            {
+                                Console.WriteLine(momentsTuples.ToString());
+                            }
+                            break;
+
+                        case OutputFormat.Json:
+                            {
+                                Console.WriteLine(JsonConvert.SerializeObject(momentsArrays, Formatting.Indented));
+                            }
+                            break;
+
+                        default:
+                            throw new InvalidOperationException();
+                    }
                 }
 
                 if (validate)
                 {
-                    csv.debug = false;
+                    raw.debug = false;
 
-                    if (csv.TryParse(ref trends))
+                    if (raw.TryParse(ref momentsTuples))
                         Console.WriteLine("File has a valid format.");
                     else
                         Console.WriteLine("File has an invalid format.");

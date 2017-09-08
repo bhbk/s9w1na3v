@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Bmon.Client.Lib.Transport.Generic
@@ -9,10 +10,20 @@ namespace Bmon.Client.Lib.Transport.Generic
     public class Ftp
     {
         private FtpClient session;
+        private StringBuilder stdout;
+
+        public StringBuilder Stdout
+        {
+            get
+            {
+                return stdout;
+            }
+        }
 
         public Ftp(Uri host, NetworkCredential credential)
         {
             session = new FtpClient(host.DnsSafeHost, credential);
+            stdout = new StringBuilder();
         }
 
         public async Task GetFolderContentsAsync(string remotePath)
@@ -25,18 +36,18 @@ namespace Bmon.Client.Lib.Transport.Generic
 
                 foreach (FtpListItem item in items)
                     if (item.Type == FtpFileSystemObjectType.Directory)
-                        Console.WriteLine("D  {0}/", item.Name);
+                        stdout.Append(string.Format("D  {0}/", item.Name));
 
                 foreach (FtpListItem item in items)
                     if (item.Type == FtpFileSystemObjectType.File)
-                        Console.WriteLine("F{0,8} {1}", item.Size, item.Name);
+                        stdout.Append(string.Format("F{0,8} {1}", item.Size, item.Name));
 
                 await session.DisconnectAsync();
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -51,15 +62,15 @@ namespace Bmon.Client.Lib.Transport.Generic
                 {
                     await session.DownloadFileAsync(localPath + @"\" + localFile, remotePath + @"/" + remoteFile, true);
 
-                    Console.WriteLine("Transfer success for {0}", localPath + @"\" + localFile);
+                    stdout.Append(string.Format("Transfer success for {0}", localPath + @"\" + localFile));
                 }
 
                 await session.DisconnectAsync();
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -74,15 +85,15 @@ namespace Bmon.Client.Lib.Transport.Generic
                 {
                     await session.UploadFileAsync(localPath + @"\" + localFile, remotePath + @"/" + remoteFile);
 
-                    Console.WriteLine("Transfer success for {0}", remotePath + @"/" + remoteFile);
+                    stdout.Append(string.Format("Transfer success for {0}", remotePath + @"/" + remoteFile));
                 }
 
                 await session.DisconnectAsync();
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
     }

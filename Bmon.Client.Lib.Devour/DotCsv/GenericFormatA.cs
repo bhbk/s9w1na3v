@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
+using System.Text;
 
 namespace Bmon.Client.Lib.Devour.DotCsv
 {
@@ -20,6 +20,15 @@ namespace Bmon.Client.Lib.Devour.DotCsv
         private DateTime timeStamp;
         private string[] row;
         public bool debug { get; set; }
+        private StringBuilder output;
+
+        public StringBuilder Stdout
+        {
+            get
+            {
+                return output;
+            }
+        }
 
         public GenericFormatA(string file)
         {
@@ -28,14 +37,15 @@ namespace Bmon.Client.Lib.Devour.DotCsv
             epoch = new DateTime(1970, 1, 1, 0, 0, 0);
             timeStamp = new DateTime();
             debug = false;
+            output = new StringBuilder();
         }
 
-        public void Parse(ref BmonPostTrendMultiple trends)
+        public void Parse(ref MultipleMomentsTuples trends)
         {
             Process(ref trends, true);
         }
 
-        public bool TryParse(ref BmonPostTrendMultiple trends)
+        public bool TryParse(ref MultipleMomentsTuples trends)
         {
             try
             {
@@ -44,13 +54,13 @@ namespace Bmon.Client.Lib.Devour.DotCsv
             }
             catch (CsvBadDataException ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                output.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
                 return false;
             }
         }
 
-        private void Process(ref BmonPostTrendMultiple trends, bool parse)
+        private void Process(ref MultipleMomentsTuples trends, bool parse)
         {
             using (fs = File.OpenRead(csv))
             using (sr = new StreamReader(fs))
@@ -84,12 +94,12 @@ namespace Bmon.Client.Lib.Devour.DotCsv
                     {
                         case 2:
                             if (debug)
-                                Console.Error.WriteLine(string.Format("{0} {1}", row[0], row[1]));
+                                output.Append(string.Format("{0} {1}", row[0], row[1]));
                             break;
 
                         case 4:
                             if (debug)
-                                Console.Error.WriteLine(string.Format("{0} {1} {2} {3}", row[0].TrimEnd(':'), row[1], row[2], row[3]));
+                                output.Append(string.Format("{0} {1} {2} {3}", row[0].TrimEnd(':'), row[1], row[2], row[3]));
                             break;
 
                         default:
@@ -139,7 +149,7 @@ namespace Bmon.Client.Lib.Devour.DotCsv
                                     trends.Readings.Add(moment);
 
                                 if (debug)
-                                    Console.WriteLine(string.Format("{0} {1} {2}", moment.Item1, moment.Item2, moment.Item3));
+                                    output.Append(string.Format("{0} {1} {2}", moment.Item1, moment.Item2, moment.Item3));
                             }
                         }
                     }

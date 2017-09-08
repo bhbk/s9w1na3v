@@ -3,6 +3,7 @@ using Dropbox.Api.Files;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 //https://blogs.dropbox.com/developers/2015/06/introducing-a-preview-of-the-new-dropbox-net-sdk-for-api-v2/
@@ -11,6 +12,15 @@ namespace Bmon.Client.Lib.Transport.Vendor
     public class Dropbox
     {
         private DropboxClient session;
+        private StringBuilder stdout;
+
+        public StringBuilder Stdout
+        {
+            get
+            {
+                return stdout;
+            }
+        }
 
         public Dropbox(string token)
         {
@@ -20,6 +30,7 @@ namespace Bmon.Client.Lib.Transport.Vendor
              * https://www.dropbox.com/developers/apps/create to set up app.
              */
             session = new DropboxClient(token);
+            stdout = new StringBuilder();
         }
 
         public async void GetUserInfoAsync()
@@ -28,12 +39,12 @@ namespace Bmon.Client.Lib.Transport.Vendor
             {
                 var acct = await session.Users.GetCurrentAccountAsync();
 
-                Console.WriteLine("Name: {0} Email: {1}", acct.Name.DisplayName, acct.Email);
+                stdout.Append(string.Format("Name: {0} Email: {1}", acct.Name.DisplayName, acct.Email));
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -44,15 +55,15 @@ namespace Bmon.Client.Lib.Transport.Vendor
                 var response = await session.Files.ListFolderAsync(remotePath);
 
                 foreach (var item in response.Entries.Where(i => i.IsFolder))
-                    Console.WriteLine("D {0}/", item.Name);
+                    stdout.Append(string.Format("D {0}/", item.Name));
 
                 foreach (var item in response.Entries.Where(i => i.IsFile))
-                    Console.WriteLine("F{0,8} {1}", item.AsFile.Size, item.Name);
+                    stdout.Append(string.Format("F{0,8} {1}", item.AsFile.Size, item.Name));
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -68,14 +79,14 @@ namespace Bmon.Client.Lib.Transport.Vendor
                         FileStream fs = File.Create(localPath + @"\" + localFile);
                         (await response.GetContentAsStreamAsync()).CopyTo(fs);
 
-                        Console.WriteLine("Transfer success for {0}", localPath + @"\" + localFile);
+                        stdout.Append(string.Format("Transfer success for {0}", localPath + @"\" + localFile));
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -94,13 +105,13 @@ namespace Bmon.Client.Lib.Transport.Vendor
 
                     var result = await session.Files.UploadAsync(localPath + "/" + localFile, WriteMode.Overwrite.Instance, body: ms);
 
-                    Console.WriteLine("Transfer success for {0} revision {1}", localPath + @"/" + localFile, result.Rev);
+                    stdout.Append(string.Format("Transfer success for {0} revision {1}", localPath + @"/" + localFile, result.Rev));
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
     }

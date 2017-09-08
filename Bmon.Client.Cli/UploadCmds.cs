@@ -3,15 +3,15 @@ using Bmon.Client.Lib.Transport;
 using ManyConsole;
 using System;
 using System.IO;
-using System.Reflection;
 using System.Net;
+using System.Reflection;
 
 namespace Bmon.Client.Cli
 {
     public class UploadCmds : ConsoleCommand
     {
         private UploadTypes upload;
-        private string file = null, format = null;
+        private string file = null;
 
         public UploadCmds()
         {
@@ -20,7 +20,7 @@ namespace Bmon.Client.Cli
             {
                 Helpers.FileSanityChecks(ref arg, ref file);
             });
-            HasRequiredOption("u|upload=", "Type of upload to perform.", arg =>
+            HasRequiredOption("u|upload-type=", "Type of upload to perform.", arg =>
             {
                 if (arg == UploadTypes.FileToDropbox.ToString())
                     upload = UploadTypes.FileToDropbox;
@@ -56,6 +56,7 @@ namespace Bmon.Client.Cli
                         {
                             Lib.Transport.Vendor.Dropbox dropbox = new Lib.Transport.Vendor.Dropbox(Core.Config.v1_0_0_0.MyDropboxToken);
                             dropbox.UploadFileAsync(localPath, localName, Core.Config.v1_0_0_0.MyDropboxDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            Console.WriteLine(dropbox.Stdout);
                         }
                         break;
 
@@ -64,6 +65,7 @@ namespace Bmon.Client.Cli
                             Lib.Transport.Generic.Ftp ftp = new Lib.Transport.Generic.Ftp(Core.Config.v1_0_0_0.MyFtpHost,
                                 new NetworkCredential(Core.Config.v1_0_0_0.MyFtpUser, Core.Config.v1_0_0_0.MyFtpPass));
                             ftp.UploadFileAsync(localPath, localName, Core.Config.v1_0_0_0.MyFtpDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            Console.WriteLine(ftp.Stdout);
                         }
                         break;
 
@@ -72,6 +74,7 @@ namespace Bmon.Client.Cli
                             Lib.Transport.Generic.Sftp sftp = new Lib.Transport.Generic.Sftp(Core.Config.v1_0_0_0.MySftpHost, Core.Config.v1_0_0_0.MySftpPort,
                                 new NetworkCredential(Core.Config.v1_0_0_0.MySftpUser, Core.Config.v1_0_0_0.MySftpPass));
                             sftp.UploadFile(localPath, localName, Core.Config.v1_0_0_0.MySftpDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            Console.WriteLine(sftp.Stdout);
                         }
                         break;
 
@@ -79,17 +82,19 @@ namespace Bmon.Client.Cli
                         {
                             Lib.Transport.Generic.Tftp tftp = new Lib.Transport.Generic.Tftp(Core.Config.v1_0_0_0.MyTftpHost);
                             tftp.UploadFile(localPath, localName, Core.Config.v1_0_0_0.MyTftpDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            Console.WriteLine(tftp.Stdout);
                         }
                         break;
 
                     case UploadTypes.WebApiToBmon:
                         {
                             Lib.Devour.DotCsv.GenericFormatA csv = new Lib.Devour.DotCsv.GenericFormatA(file);
-                            Lib.Models.BmonPostTrendMultiple trends = new BmonPostTrendMultiple();
+                            Lib.Models.MultipleMomentsTuples trends = new MultipleMomentsTuples();
                             csv.Parse(ref trends);
                             
                             Lib.Transport.Vendor.Bmon bmonApi = new Lib.Transport.Vendor.Bmon(Core.Config.v1_0_0_0.MyBmonHost);
                             bmonApi.PostAsync(Core.Config.v1_0_0_0.MyBmonPostPath, trends);
+                            Console.WriteLine(bmonApi.Stdout);
                         }
                         break;
 

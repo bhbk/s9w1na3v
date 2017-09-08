@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Text;
 using System.Threading;
 using Tftp.Net;
@@ -12,6 +11,15 @@ namespace Bmon.Client.Lib.Transport.Generic
         private TftpClient session;
         private ITftpTransfer transfer;
         private AutoResetEvent finished = new AutoResetEvent(false);
+        private StringBuilder stdout;
+
+        public StringBuilder Stdout
+        {
+            get
+            {
+                return stdout;
+            }
+        }
 
         public Tftp(Uri host)
         {
@@ -19,6 +27,7 @@ namespace Bmon.Client.Lib.Transport.Generic
             transfer.OnProgress += new TftpProgressHandler(transferOnProgress);
             transfer.OnFinished += new TftpEventHandler(transferOnFinshed);
             transfer.OnError += new TftpErrorHandler(transferOnError);
+            stdout = new StringBuilder();
         }
 
         public void GetFolderContents(string remoteDirAndPath)
@@ -50,8 +59,8 @@ namespace Bmon.Client.Lib.Transport.Generic
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -72,25 +81,25 @@ namespace Bmon.Client.Lib.Transport.Generic
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
         private void transferOnProgress(ITftpTransfer transfer, TftpTransferProgress progress)
         {
-            Console.WriteLine("Transfer progress for {0} is {1}", transfer.Filename, progress);
+            stdout.Append(string.Format("Transfer progress for {0} is {1}", transfer.Filename, progress));
         }
 
         private void transferOnError(ITftpTransfer transfer, TftpTransferError error)
         {
-            Console.Error.WriteLine("Transfer failure for {0} with error {1}", transfer.Filename, error);
+            stdout.Append(string.Format("Transfer failure for {0} with error {1}", transfer.Filename, error));
             finished.Set();
         }
 
         private void transferOnFinshed(ITftpTransfer transfer)
         {
-            Console.WriteLine("Transfer success for {0}", transfer.Filename);
+            stdout.Append(string.Format("Transfer success for {0}", transfer.Filename));
             finished.Set();
         }
     }

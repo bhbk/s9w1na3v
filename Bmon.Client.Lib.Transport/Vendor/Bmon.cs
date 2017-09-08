@@ -1,6 +1,7 @@
 ﻿using Bmon.Client.Lib.Models;
 using System;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Bmon.Client.Lib.Transport.Vendor
@@ -8,13 +9,23 @@ namespace Bmon.Client.Lib.Transport.Vendor
     public class Bmon
     {
         private Uri server;
+        private StringBuilder stdout;
+
+        public StringBuilder Stdout
+        {
+            get
+            {
+                return stdout;
+            }
+        }
 
         public Bmon(Uri host)
         {
             server = host;
+            stdout = new StringBuilder();
         }
 
-        public async Task<HttpResponseMessage> PostAsync(string path, BmonPostTrendMultiple trends)
+        public async Task<HttpResponseMessage> PostAsync(string path, MultipleMomentsTuples trends)
         {
             using (var client = new HttpClient())
             {

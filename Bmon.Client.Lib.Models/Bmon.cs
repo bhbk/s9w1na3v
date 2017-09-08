@@ -6,30 +6,43 @@ using System.Text;
 namespace Bmon.Client.Lib.Models
 {
     [Serializable]
-    public class BmonPostTrendMultiple
+    public class MultipleMomentsArrays
+    {
+        public string StoreKey { get; set; }
+        public List<List<string>> Readings { get; set; }
+
+        public MultipleMomentsArrays()
+        {
+            StoreKey = string.Empty;
+            Readings = new List<List<string>>();
+        }
+    }
+
+    [Serializable]
+    public class MultipleMomentsTuples
     {
         public string StoreKey { get; set; }
         public List<Tuple<double, string, double>> Readings { get; set; }
 
-        public BmonPostTrendMultiple()
+        public MultipleMomentsTuples()
         {
             StoreKey = string.Empty;
             Readings = new List<Tuple<double, string, double>>();
         }
 
-        public BmonPostTrendMultiple(string storeKey)
+        public MultipleMomentsTuples(string storeKey)
         {
             StoreKey = storeKey;
             Readings = new List<Tuple<double, string, double>>();
         }
 
-        public BmonPostTrendMultiple(string storeKey, List<Tuple<double, string, double>> readings)
+        public MultipleMomentsTuples(string storeKey, List<Tuple<double, string, double>> readings)
         {
             StoreKey = storeKey;
             Readings = readings;
         }
 
-        public BmonPostTrendMultiple(List<Tuple<double, string, double>> readings)
+        public MultipleMomentsTuples(List<Tuple<double, string, double>> readings)
         {
             StoreKey = string.Empty;
             Readings = readings;
@@ -46,6 +59,6 @@ namespace Bmon.Client.Lib.Models
             }
 
             return trends.ToString();
-        }
+        }        
     }
 }

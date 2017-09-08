@@ -1,8 +1,8 @@
 ﻿using Renci.SshNet;
-using Renci.SshNet.Async;
 using System;
 using System.IO;
 using System.Net;
+using System.Text;
 
 namespace Bmon.Client.Lib.Transport.Generic
 {
@@ -11,6 +11,15 @@ namespace Bmon.Client.Lib.Transport.Generic
         private ConnectionInfo info;
         private SshClient cmds;
         private SftpClient session;
+        private StringBuilder stdout;
+
+        public StringBuilder Stdout
+        {
+            get
+            {
+                return stdout;
+            }
+        }
 
         public Sftp(Uri host, int port, NetworkCredential credential)
         {
@@ -22,6 +31,7 @@ namespace Bmon.Client.Lib.Transport.Generic
 
             cmds = new SshClient(info);
             session = new SftpClient(info);
+            stdout = new StringBuilder();
         }
 
         public Sftp(Uri host, int port, string userName, string filePathAndName, string passPhrase)
@@ -39,6 +49,7 @@ namespace Bmon.Client.Lib.Transport.Generic
 
                 cmds = new SshClient(info);
                 session = new SftpClient(info);
+                stdout = new StringBuilder();
             }
         }
 
@@ -51,16 +62,17 @@ namespace Bmon.Client.Lib.Transport.Generic
                 using (var cmd = cmds.CreateCommand(command))
                 {
                     cmd.Execute();
-                    Console.WriteLine("Command>" + cmd.CommandText);
-                    Console.WriteLine("Return Value = {0}", cmd.ExitStatus);
+
+                    stdout.Append(string.Format("Command = {0}", cmd.CommandText + Environment.NewLine));
+                    stdout.Append(string.Format("Return Value = {0}", cmd.ExitStatus + Environment.NewLine));
                 }
 
                 cmds.Disconnect();
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -77,9 +89,8 @@ namespace Bmon.Client.Lib.Transport.Generic
                     using (FileStream fs = File.Create(localPath + @"\" + localFile))
                     {
                         session.DownloadFile(remotePath + @"/" + remoteFile, fs, null);
-                        fs.Close();
 
-                        Console.WriteLine("Transfer success for {0}", localPath + @"\" + localFile);
+                        stdout.Append(string.Format("Transfer success for {0}", localPath + @"\" + localFile));
                     }
                 }
 
@@ -87,8 +98,8 @@ namespace Bmon.Client.Lib.Transport.Generic
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
 
@@ -101,12 +112,12 @@ namespace Bmon.Client.Lib.Transport.Generic
 
                 using (var fs = File.OpenRead(localPath + @"\" + localFile))
                 {
-                    if (session.Exists(remotePath + @"\" + remoteFile) && action == FileAction.OverwriteIfExist
-                        || (!session.Exists(remotePath + @"\" + remoteFile)))
+                    if (session.Exists(remotePath + @"/" + remoteFile) && action == FileAction.OverwriteIfExist
+                        || (!session.Exists(remotePath + @"/" + remoteFile)))
                     {
-                        session.UploadFile(fs, remotePath + @"\" + remoteFile, true);
+                        session.UploadFile(fs, remotePath + @"/" + remoteFile, true);
 
-                        Console.WriteLine("Transfer success for {0}", remotePath + @"\" + remoteFile);
+                        stdout.Append(string.Format("Transfer success for {0}", remotePath + @"/" + remoteFile));
                     }
                 }
 
@@ -114,8 +125,8 @@ namespace Bmon.Client.Lib.Transport.Generic
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine(ex.Message);
-                Console.Error.WriteLine(ex.StackTrace);
+                stdout.Append(ex.Message + Environment.NewLine
+                    + ex.StackTrace + Environment.NewLine);
             }
         }
     }
