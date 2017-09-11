@@ -40,11 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\Globals.cs" />
+    <Compile Include="Config\v1_0_0_0.cs" />
     <Compile Include="Echo\Proxy.cs" />
     <Compile Include="Echo\EventLogs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Statics.cs" />
-    <Compile Include="Config\v1_0_0_0.cs" />
+    <Compile Include="Config\v0_1_0_0.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bmon.Client.Lib.Devour\Bmon.Client.Lib.Devour.csproj">

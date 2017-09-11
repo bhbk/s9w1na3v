@@ -6,14 +6,14 @@ namespace Bmon.Client.Cli
 {
     public class ConfigCmds : ConsoleCommand
     {
-        private string conf = null;
+        private string Conf = null;
 
         public ConfigCmds()
         {
             IsCommand("config", "Do configuration things...");
 
-            HasOption("s|show=", "Show a configuration.", arg => conf = arg);
-            HasOption("v|validate=", "Validate a configuration.", arg => conf = arg);
+            HasOption("s|show=", "Show a configuration.", arg => Conf = arg);
+            HasOption("v|validate=", "Validate a configuration.", arg => Conf = arg);
             HasAdditionalArguments(1, "<file>");
         }
 

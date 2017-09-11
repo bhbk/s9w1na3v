@@ -1,4 +1,5 @@
-﻿using Dropbox.Api;
+﻿using Bmon.Client.Lib.Models;
+using Dropbox.Api;
 using Dropbox.Api.Files;
 using System;
 using System.IO;
@@ -11,14 +12,14 @@ namespace Bmon.Client.Lib.Transport.Vendor
 {
     public class Dropbox
     {
-        private DropboxClient session;
-        private StringBuilder stdout;
+        private DropboxClient Session;
+        private StringBuilder StandardOutput;
 
-        public StringBuilder Stdout
+        public StringBuilder Output
         {
             get
             {
-                return stdout;
+                return StandardOutput;
             }
         }
 
@@ -29,21 +30,21 @@ namespace Bmon.Client.Lib.Transport.Vendor
              * that users enter so that application setup doesn't require normal users to visit
              * https://www.dropbox.com/developers/apps/create to set up app.
              */
-            session = new DropboxClient(token);
-            stdout = new StringBuilder();
+            Session = new DropboxClient(token);
+            StandardOutput = new StringBuilder();
         }
 
         public async void GetUserInfoAsync()
         {
             try
             {
-                var acct = await session.Users.GetCurrentAccountAsync();
+                var acct = await Session.Users.GetCurrentAccountAsync();
 
-                stdout.Append(string.Format("Name: {0} Email: {1}", acct.Name.DisplayName, acct.Email));
+                StandardOutput.Append(string.Format("Name: {0} Email: {1}", acct.Name.DisplayName, acct.Email));
             }
             catch (Exception ex)
             {
-                stdout.Append(ex.Message + Environment.NewLine
+                StandardOutput.Append(ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
             }
         }
@@ -52,17 +53,17 @@ namespace Bmon.Client.Lib.Transport.Vendor
         {
             try
             {
-                var response = await session.Files.ListFolderAsync(remotePath);
+                var response = await Session.Files.ListFolderAsync(remotePath);
 
                 foreach (var item in response.Entries.Where(i => i.IsFolder))
-                    stdout.Append(string.Format("D {0}/", item.Name));
+                    StandardOutput.Append(string.Format("D {0}/", item.Name));
 
                 foreach (var item in response.Entries.Where(i => i.IsFile))
-                    stdout.Append(string.Format("F{0,8} {1}", item.AsFile.Size, item.Name));
+                    StandardOutput.Append(string.Format("F{0,8} {1}", item.AsFile.Size, item.Name));
             }
             catch (Exception ex)
             {
-                stdout.Append(ex.Message + Environment.NewLine
+                StandardOutput.Append(ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
             }
         }
@@ -74,18 +75,18 @@ namespace Bmon.Client.Lib.Transport.Vendor
                 if (File.Exists(localPath + @"\" + localFile) && action == FileAction.OverwriteIfExist
                     || (!File.Exists(localPath + @"\" + localFile)))
                 {
-                    using (var response = await session.Files.DownloadAsync(remotePath + @"/" + remoteFile))
+                    using (var response = await Session.Files.DownloadAsync(remotePath + @"/" + remoteFile))
                     {
                         FileStream fs = File.Create(localPath + @"\" + localFile);
                         (await response.GetContentAsStreamAsync()).CopyTo(fs);
 
-                        stdout.Append(string.Format("Transfer success for {0}", localPath + @"\" + localFile));
+                        StandardOutput.Append(string.Format("Transfer success for {0}", localPath + @"\" + localFile));
                     }
                 }
             }
             catch (Exception ex)
             {
-                stdout.Append(ex.Message + Environment.NewLine
+                StandardOutput.Append(ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
             }
         }
@@ -103,14 +104,14 @@ namespace Bmon.Client.Lib.Transport.Vendor
                      * add check for remote file before doing upload
                      */
 
-                    var result = await session.Files.UploadAsync(localPath + "/" + localFile, WriteMode.Overwrite.Instance, body: ms);
+                    var result = await Session.Files.UploadAsync(localPath + "/" + localFile, WriteMode.Overwrite.Instance, body: ms);
 
-                    stdout.Append(string.Format("Transfer success for {0} revision {1}", localPath + @"/" + localFile, result.Rev));
+                    StandardOutput.Append(string.Format("Transfer success for {0} revision {1}", localPath + @"/" + localFile, result.Rev));
                 }
             }
             catch (Exception ex)
             {
-                stdout.Append(ex.Message + Environment.NewLine
+                StandardOutput.Append(ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
             }
         }

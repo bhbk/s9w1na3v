@@ -1,4 +1,5 @@
 ﻿using Bmon.Client.Lib.Devour;
+using Bmon.Client.Lib.Models;
 using ManyConsole;
 using Newtonsoft.Json;
 using System;
@@ -9,9 +10,9 @@ namespace Bmon.Client.Cli
 {
     public class DevourCmds : ConsoleCommand
     {
-        private OutputFormat format;
-        private string file = null;
-        private bool validate = false, show = false;
+        private OutputFormat Format;
+        private string InputFile = null;
+        private bool Validate = false, Show = false;
 
         public DevourCmds()
         {
@@ -19,18 +20,18 @@ namespace Bmon.Client.Cli
 
             HasRequiredOption("f|file=", "File to parse. File must exist.", arg =>
             {
-                Helpers.FileSanityChecks(ref arg, ref file);
+                Helpers.FileSanityChecks(ref arg, ref InputFile);
             });
-            HasOption("s|show", "Show parsed information.", arg => { show = true; });
+            HasOption("s|show", "Show parsed information.", arg => { Show = true; });
             HasOption("o|output-format=", "Show output format.", arg => 
             {
-                if (show)
+                if (Show)
                 {
-                    if (arg == OutputFormat.Csv.ToString())
-                        format = OutputFormat.Csv;
+                    if (arg.ToLower() == OutputFormat.Csv.ToString().ToLower())
+                        Format = OutputFormat.Csv;
 
-                    else if (arg == OutputFormat.Json.ToString())
-                        format = OutputFormat.Json;
+                    else if (arg.ToLower() == OutputFormat.Json.ToString().ToLower())
+                        Format = OutputFormat.Json;
 
                     else
                         throw new ConsoleHelpAsException("Invalid output format...");
@@ -38,36 +39,36 @@ namespace Bmon.Client.Cli
                 else
                     throw new ConsoleHelpAsException("Invalid use of output-format...");
             });
-            HasOption("v|validate", "Validate file.", arg => { validate = true; });
+            HasOption("v|validate", "Validate file.", arg => { Validate = true; });
         }
 
         public override int Run(string[] remainingArguments)
         {
             try
             {
-                Lib.Devour.DotCsv.GenericFormatA raw = new Lib.Devour.DotCsv.GenericFormatA(file);
-                Lib.Models.MultipleMomentsTuples momentsTuples = new Lib.Models.MultipleMomentsTuples();
-                Lib.Models.MultipleMomentsArrays momentsArrays = new Lib.Models.MultipleMomentsArrays();
+                Lib.Devour.DotCsv.GenericFormatA raw = new Lib.Devour.DotCsv.GenericFormatA(InputFile);
+                MomentTuples momentTuples = new MomentTuples();
+                MomentArrays momentArrays = new MomentArrays();
 
-                if (show)
+                if (Show)
                 {
-                    raw.Parse(ref momentsTuples);
-                    Console.WriteLine(raw.Stdout);
+                    raw.Parse(ref momentTuples);
+                    Console.WriteLine(raw.Output);
 
-                    foreach (Tuple<double, string, double> t in momentsTuples.Readings)
-                        momentsArrays.Readings.Add(new List<string>() { t.Item1.ToString(), t.Item2.ToString(), t.Item3.ToString() });
+                    foreach (Tuple<double, string, double> t in momentTuples.Readings)
+                        momentArrays.Readings.Add(new List<string>() { t.Item1.ToString(), t.Item2.ToString(), t.Item3.ToString() });
 
-                    switch (format)
+                    switch (Format)
                     {
                         case OutputFormat.Csv:
                             {
-                                Console.WriteLine(momentsTuples.ToString());
+                                Console.WriteLine(momentTuples.ToString());
                             }
                             break;
 
                         case OutputFormat.Json:
                             {
-                                Console.WriteLine(JsonConvert.SerializeObject(momentsArrays, Formatting.Indented));
+                                Console.WriteLine(JsonConvert.SerializeObject(momentArrays, Formatting.Indented));
                             }
                             break;
 
@@ -76,11 +77,11 @@ namespace Bmon.Client.Cli
                     }
                 }
 
-                if (validate)
+                if (Validate)
                 {
-                    raw.debug = false;
+                    raw.Debug = false;
 
-                    if (raw.TryParse(ref momentsTuples))
+                    if (raw.TryParse(ref momentTuples))
                         Console.WriteLine("File has a valid format.");
                     else
                         Console.WriteLine("File has an invalid format.");
@@ -90,7 +91,7 @@ namespace Bmon.Client.Cli
             }
             catch (Exception ex)
             {
-                Bmon.Client.Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
+                Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
                 return Helpers.AngryFarewell(ex);
             }
         }

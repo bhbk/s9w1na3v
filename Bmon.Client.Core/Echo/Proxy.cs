@@ -7,34 +7,34 @@ namespace Bmon.Client.Core.Echo
     public class Proxy
     {
         [Flags]
-        public enum levels
+        public enum DebugLevels
         {
-            none = 0x01,
-            audit_success = 0x03,
-            audit_fail = 0x05,
-            info = 0x07,
-            debug = 0x9,
+            None = 0x01,
+            AuditSuccess = 0x03,
+            AuditFail = 0x05,
+            Info = 0x07,
+            Debug = 0x9,
         }
 
         public class Audit
         {
-            public static void Msg(String executingassembly, String method, StringBuilder msg, levels lvl)
+            public static void Msg(String executingassembly, String method, StringBuilder msg, DebugLevels level)
             {
-                switch (lvl)
+                switch (level)
                 {
-                    case levels.debug:
-                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
+                    case DebugLevels.Debug:
+                        Core.Echo.EventLogs.Record(Config.Globals.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
                         break;
-                    case levels.info:
-                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
+                    case DebugLevels.Info:
+                        Core.Echo.EventLogs.Record(Config.Globals.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.Information);
                         break;
-                    case levels.audit_fail:
-                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.FailureAudit);
+                    case DebugLevels.AuditFail:
+                        Core.Echo.EventLogs.Record(Config.Globals.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.FailureAudit);
                         break;
-                    case levels.audit_success:
-                        Bmon.Client.Core.Echo.EventLogs.Record(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.SuccessAudit);
+                    case DebugLevels.AuditSuccess:
+                        Core.Echo.EventLogs.Record(Config.Globals.MyEventLogSource, executingassembly, method, msg.ToString(), EventLogEntryType.SuccessAudit);
                         break;
-                    case levels.none:
+                    case DebugLevels.None:
                         break;
                     default:
                         break;
@@ -46,7 +46,7 @@ namespace Bmon.Client.Core.Echo
         {
             public static void Msg(String executingassembly, String method, Exception ex)
             {
-                Bmon.Client.Core.Echo.EventLogs.write(Config.v1_0_0_0.MyEventLogSource, executingassembly, method, ex);
+                Core.Echo.EventLogs.Record(Config.Globals.MyEventLogSource, executingassembly, method, ex);
             }
         }
     }

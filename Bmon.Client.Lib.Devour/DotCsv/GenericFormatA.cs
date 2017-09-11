@@ -11,41 +11,41 @@ namespace Bmon.Client.Lib.Devour.DotCsv
 {
     public class GenericFormatA
     {
-        private string csv;
-        private FileStream fs;
-        private StreamReader sr;
-        private CsvParser csvr;
-        private CsvConfiguration conf;
-        private DateTime epoch;
-        private DateTime timeStamp;
-        private string[] row;
-        public bool debug { get; set; }
-        private StringBuilder output;
+        private string InputFile;
+        private FileStream Fs;
+        private StreamReader Sr;
+        private CsvParser Csvr;
+        private CsvConfiguration CsvConf;
+        private DateTime Epoch;
+        private DateTime TimeStamp;
+        private string[] Row;
+        public bool Debug { get; set; }
+        private StringBuilder StandardOut;
 
-        public StringBuilder Stdout
+        public StringBuilder Output
         {
             get
             {
-                return output;
+                return StandardOut;
             }
         }
 
         public GenericFormatA(string file)
         {
-            csv = file;
-            conf = new CsvConfiguration();
-            epoch = new DateTime(1970, 1, 1, 0, 0, 0);
-            timeStamp = new DateTime();
-            debug = false;
-            output = new StringBuilder();
+            InputFile = file;
+            CsvConf = new CsvConfiguration();
+            Epoch = new DateTime(1970, 1, 1, 0, 0, 0);
+            TimeStamp = new DateTime();
+            Debug = false;
+            StandardOut = new StringBuilder();
         }
 
-        public void Parse(ref MultipleMomentsTuples trends)
+        public void Parse(ref MomentTuples trends)
         {
             Process(ref trends, true);
         }
 
-        public bool TryParse(ref MultipleMomentsTuples trends)
+        public bool TryParse(ref MomentTuples trends)
         {
             try
             {
@@ -54,52 +54,52 @@ namespace Bmon.Client.Lib.Devour.DotCsv
             }
             catch (CsvBadDataException ex)
             {
-                output.Append(ex.Message + Environment.NewLine
+                StandardOut.Append(ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
                 return false;
             }
         }
 
-        private void Process(ref MultipleMomentsTuples trends, bool parse)
+        private void Process(ref MomentTuples trends, bool parse)
         {
-            using (fs = File.OpenRead(csv))
-            using (sr = new StreamReader(fs))
-            using (csvr = new CsvParser(sr, conf))
+            using (Fs = File.OpenRead(InputFile))
+            using (Sr = new StreamReader(Fs))
+            using (Csvr = new CsvParser(Sr, CsvConf))
             {
                 List<Tuple<string, string, string>> meta = new List<Tuple<string, string, string>>();
 
                 /*
                  * skipping first line that has bad format.
                  */
-                row = csvr.Read();
+                Row = Csvr.Read();
 
                 while (true)
                 {
-                    row = csvr.Read();
+                    Row = Csvr.Read();
 
                     /*
                      * exit this loop when we hit first empty row. at this point we should know how
                      * many trend moments exist for processing in the next loop.
                      */
-                    if (row[0] == string.Empty)
+                    if (Row[0] == string.Empty)
                         break;
 
                     /*
                      * generate a 3-tuple to store meta data about trend moments.
                      */
-                    if (row[0].ToLower().Contains("point"))
-                        meta.Add(new Tuple<string, string, string>(row[0].TrimEnd(':'), row[1], row[2]));
+                    if (Row[0].ToLower().Contains("point"))
+                        meta.Add(new Tuple<string, string, string>(Row[0].TrimEnd(':'), Row[1], Row[2]));
 
-                    switch (row.Length)
+                    switch (Row.Length)
                     {
                         case 2:
-                            if (debug)
-                                output.Append(string.Format("{0} {1}", row[0], row[1]));
+                            if (Debug)
+                                StandardOut.Append(string.Format("{0} {1}", Row[0], Row[1]));
                             break;
 
                         case 4:
-                            if (debug)
-                                output.Append(string.Format("{0} {1} {2} {3}", row[0].TrimEnd(':'), row[1], row[2], row[3]));
+                            if (Debug)
+                                StandardOut.Append(string.Format("{0} {1} {2} {3}", Row[0].TrimEnd(':'), Row[1], Row[2], Row[3]));
                             break;
 
                         default:
@@ -110,26 +110,26 @@ namespace Bmon.Client.Lib.Devour.DotCsv
                 /*
                  * skipping the header line that has all the trend moments after it.
                  */
-                row = csvr.Read();
+                Row = Csvr.Read();
 
                 while (true)
                 {
-                    row = csvr.Read();
+                    Row = Csvr.Read();
 
-                    if (row == null)
+                    if (Row == null)
                         break;
 
                     /*
                      * ensure the number of fields in these rows match the number of trend moments calculated in 
                      * the previous loop. do not forget to add the date & time field to the total count.
                      */
-                    else if (row.Length == (meta.Count + 2))
+                    else if (Row.Length == (meta.Count + 2))
                     {
                         /*
                          * ensure the date & time fields can be properly parsed after they are concatenated. throw
                          * exception if not.
                          */
-                        if (!DateTime.TryParse(row[0] + " " + row[1], out timeStamp))
+                        if (!DateTime.TryParse(Row[0] + " " + Row[1], out TimeStamp))
                             throw new CsvBadDataException();
 
                         for (int i = 0; i < meta.Count; i++)
@@ -140,16 +140,16 @@ namespace Bmon.Client.Lib.Devour.DotCsv
                             /*
                              * ensure the reading field can be properly parsed. skip if not.
                              */
-                            if (double.TryParse(row[i + 2], out reading))
+                            if (double.TryParse(Row[i + 2], out reading))
                             {
-                                seconds = (timeStamp.ToUniversalTime() - epoch).TotalSeconds;
+                                seconds = (TimeStamp.ToUniversalTime() - Epoch).TotalSeconds;
                                 moment = new Tuple<double, string, double>(seconds, meta.ElementAt(i).Item2, reading);
 
                                 if (parse)
                                     trends.Readings.Add(moment);
 
-                                if (debug)
-                                    output.Append(string.Format("{0} {1} {2}", moment.Item1, moment.Item2, moment.Item3));
+                                if (Debug)
+                                    StandardOut.Append(string.Format("{0} {1} {2}", moment.Item1, moment.Item2, moment.Item3));
                             }
                         }
                     }

@@ -8,32 +8,34 @@ namespace Bmon.Client.Lib.Transport.Vendor
 {
     public class Bmon
     {
-        private Uri server;
-        private StringBuilder stdout;
+        private Uri Server;
+        private string StoreKey;
+        private StringBuilder StandardOutput;
 
-        public StringBuilder Stdout
+        public StringBuilder Output
         {
             get
             {
-                return stdout;
+                return StandardOutput;
             }
         }
 
-        public Bmon(Uri host)
+        public Bmon(Uri host, string key)
         {
-            server = host;
-            stdout = new StringBuilder();
+            Server = host;
+            StoreKey = key;
+            StandardOutput = new StringBuilder();
         }
 
-        public async Task<HttpResponseMessage> PostAsync(string path, MultipleMomentsTuples trends)
+        public async Task<HttpResponseMessage> PostAsync(string path, MomentArrays moments)
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = server;
+                client.BaseAddress = Server;
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-                HttpResponseMessage response = client.PostAsJsonAsync(path, trends).Result;
+                HttpResponseMessage response = client.PostAsJsonAsync(path, moments).Result;
 
                 return await Task.FromResult(response);
             }

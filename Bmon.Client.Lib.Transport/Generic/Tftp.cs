@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bmon.Client.Lib.Models;
+using System;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -8,26 +9,26 @@ namespace Bmon.Client.Lib.Transport.Generic
 {
     public class Tftp
     {
-        private TftpClient session;
-        private ITftpTransfer transfer;
-        private AutoResetEvent finished = new AutoResetEvent(false);
-        private StringBuilder stdout;
+        private TftpClient Session;
+        private ITftpTransfer Transfer;
+        private AutoResetEvent Finished = new AutoResetEvent(false);
+        private StringBuilder StandardOutput;
 
-        public StringBuilder Stdout
+        public StringBuilder Output
         {
             get
             {
-                return stdout;
+                return StandardOutput;
             }
         }
 
         public Tftp(Uri host)
         {
-            session = new TftpClient(host.DnsSafeHost);
-            transfer.OnProgress += new TftpProgressHandler(transferOnProgress);
-            transfer.OnFinished += new TftpEventHandler(transferOnFinshed);
-            transfer.OnError += new TftpErrorHandler(transferOnError);
-            stdout = new StringBuilder();
+            Session = new TftpClient(host.DnsSafeHost);
+            Transfer.OnProgress += new TftpProgressHandler(transferOnProgress);
+            Transfer.OnFinished += new TftpEventHandler(transferOnFinshed);
+            Transfer.OnError += new TftpErrorHandler(transferOnError);
+            StandardOutput = new StringBuilder();
         }
 
         public void GetFolderContents(string remoteDirAndPath)
@@ -51,15 +52,15 @@ namespace Bmon.Client.Lib.Transport.Generic
                         MemoryStream ms = new MemoryStream();
                         fs.CopyTo(ms);
 
-                        transfer = session.Download(remotePath + @"\" + remoteFile);
-                        transfer.Start(ms);
-                        finished.WaitOne();
+                        Transfer = Session.Download(remotePath + @"\" + remoteFile);
+                        Transfer.Start(ms);
+                        Finished.WaitOne();
                     }
                 }
             }
             catch (Exception ex)
             {
-                stdout.Append(ex.Message + Environment.NewLine
+                StandardOutput.Append(ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
             }
         }
@@ -74,33 +75,33 @@ namespace Bmon.Client.Lib.Transport.Generic
                     MemoryStream ms = new MemoryStream();
                     fs.CopyTo(ms);
 
-                    transfer = session.Upload(remotePath + @"\" + remoteFile);
-                    transfer.Start(ms);
-                    finished.WaitOne();
+                    Transfer = Session.Upload(remotePath + @"\" + remoteFile);
+                    Transfer.Start(ms);
+                    Finished.WaitOne();
                 }
             }
             catch (Exception ex)
             {
-                stdout.Append(ex.Message + Environment.NewLine
+                StandardOutput.Append(ex.Message + Environment.NewLine
                     + ex.StackTrace + Environment.NewLine);
             }
         }
 
         private void transferOnProgress(ITftpTransfer transfer, TftpTransferProgress progress)
         {
-            stdout.Append(string.Format("Transfer progress for {0} is {1}", transfer.Filename, progress));
+            StandardOutput.Append(string.Format("Transfer progress for {0} is {1}", transfer.Filename, progress));
         }
 
         private void transferOnError(ITftpTransfer transfer, TftpTransferError error)
         {
-            stdout.Append(string.Format("Transfer failure for {0} with error {1}", transfer.Filename, error));
-            finished.Set();
+            StandardOutput.Append(string.Format("Transfer failure for {0} with error {1}", transfer.Filename, error));
+            Finished.Set();
         }
 
         private void transferOnFinshed(ITftpTransfer transfer)
         {
-            stdout.Append(string.Format("Transfer success for {0}", transfer.Filename));
-            finished.Set();
+            StandardOutput.Append(string.Format("Transfer success for {0}", transfer.Filename));
+            Finished.Set();
         }
     }
 }
