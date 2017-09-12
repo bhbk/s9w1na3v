@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Bmon.Client.Lib.Models
 {
-    internal abstract class BaseDevourConfig
+    public abstract class DevourConfig
     {
-
+        DevourConfig() { }
     }
 
     public enum FileAction

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace Bmon.Client.Cli
 {
@@ -13,6 +14,7 @@ namespace Bmon.Client.Cli
     {
         private UploadMethods Decide;
         private string InputFile = null;
+        private string ConfigFile = "UploadConfig.xml";
 
         public UploadCmds()
         {
@@ -38,6 +40,9 @@ namespace Bmon.Client.Cli
                 else if (arg.ToLower() == UploadMethods.WebApiToBmon.ToString().ToLower())
                     Decide = UploadMethods.WebApiToBmon;
 
+                else if (arg.ToLower() == UploadMethods.DoNothing.ToString().ToLower())
+                    Decide = UploadMethods.DoNothing;
+
                 else
                     throw new ConsoleHelpAsException("Invalid upload type...");
             });
@@ -47,6 +52,17 @@ namespace Bmon.Client.Cli
         {
             try
             {
+                Core.Config.v1_0_0_0.UploadConfig MyConfigs = new Core.Config.v1_0_0_0.UploadConfig();
+                MyConfigs.MyDropbox.Add(new FileToDropboxConfig("12345", "/"));
+                MyConfigs.MyFtp.Add(new FileViaFtpConfig("https://bmon.ahfc.us", new NetworkCredential("username", "password"), "/"));
+                MyConfigs.MySftp.Add(new FileViaSftpConfig("https://bmon.ahfc.us", 22, new NetworkCredential("username", "password"), "/"));
+                MyConfigs.MyTftp.Add(new FileViaTftpConfig("https://bmon.ahfc.us", "/"));
+                MyConfigs.MyWebApiToBmon.Add(new WebApiToBmonConfig("https://bmon.ahfc.us", "/readingdb/reading/store/", "12345678"));
+
+                XmlSerializer x = new XmlSerializer(MyConfigs.GetType());
+                StreamWriter writer = new StreamWriter(ConfigFile);
+                x.Serialize(writer, MyConfigs);
+
                 string localPath = new FileInfo(InputFile).DirectoryName;
                 string localName = new FileInfo(InputFile).Name;
                 string remoteName = localName;
@@ -56,39 +72,49 @@ namespace Bmon.Client.Cli
                 {
                     case UploadMethods.FileToDropbox:
                         {
-                            decision = new Lib.Transport.Vendor.Dropbox(Core.Config.v0_1_0_0.MyDropboxToken);
-                            decision.UploadFileAsync(localPath, localName, Core.Config.v0_1_0_0.MyDropboxDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            foreach (var config in MyConfigs.MyDropbox)
+                            {
+                                decision = new Lib.Transport.Vendor.Dropbox(config.Token);
+                                decision.UploadFileAsync(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
 
-                            Console.WriteLine(decision.Stdout);
+                                Console.WriteLine(decision.Output);
+                            }
                         }
                         break;
 
                     case UploadMethods.FileViaFtp:
                         {
-                            decision = new Lib.Transport.Generic.Ftp(Core.Config.v0_1_0_0.MyFtpHost,
-                                new NetworkCredential(Core.Config.v0_1_0_0.MyFtpUser, Core.Config.v0_1_0_0.MyFtpPass));
-                            decision.UploadFileAsync(localPath, localName, Core.Config.v0_1_0_0.MyFtpDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            foreach (var config in MyConfigs.MyFtp)
+                            {
+                                decision = new Lib.Transport.Generic.Ftp(new Uri(config.Server), config.Credential);
+                                decision.UploadFileAsync(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
 
-                            Console.WriteLine(decision.Stdout);
+                                Console.WriteLine(decision.Output);
+                            }
                         }
                         break;
 
                     case UploadMethods.FileViaSftp:
                         {
-                            decision = new Lib.Transport.Generic.Sftp(Core.Config.v0_1_0_0.MySftpHost, Core.Config.v0_1_0_0.MySftpPort,
-                                new NetworkCredential(Core.Config.v0_1_0_0.MySftpUser, Core.Config.v0_1_0_0.MySftpPass));
-                            decision.UploadFile(localPath, localName, Core.Config.v0_1_0_0.MySftpDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            foreach (var config in MyConfigs.MySftp)
+                            {
+                                decision = new Lib.Transport.Generic.Sftp(new Uri(config.Server), config.Port, config.Credential);
+                                decision.UploadFile(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
 
-                            Console.WriteLine(decision.Stdout);
+                                Console.WriteLine(decision.Output);
+                            }
                         }
                         break;
 
                     case UploadMethods.FileViaTftp:
                         {
-                            decision = new Lib.Transport.Generic.Tftp(Core.Config.v0_1_0_0.MyTftpHost);
-                            decision.UploadFile(localPath, localName, Core.Config.v0_1_0_0.MyTftpDefaultPath, remoteName, FileAction.OverwriteIfExist);
+                            foreach (var config in MyConfigs.MyTftp)
+                            {
+                                decision = new Lib.Transport.Generic.Tftp(new Uri(config.Server));
+                                decision.UploadFile(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
 
-                            Console.WriteLine(decision.Stdout);
+                                Console.WriteLine(decision.Output);
+                            }
                         }
                         break;
 
@@ -104,11 +130,16 @@ namespace Bmon.Client.Cli
                             foreach (Tuple<double, string, double> t in momentTuples.Readings)
                                 momentArrays.Readings.Add(new List<string>() { t.Item1.ToString(), t.Item2.ToString(), t.Item3.ToString() });
 
-                            decision = new Lib.Transport.Vendor.Bmon(Core.Config.v0_1_0_0.MyBmonHost, Core.Config.v0_1_0_0.MyBmonStoreKey);
-                            decision.PostAsync(Core.Config.v0_1_0_0.MyBmonPostPath, momentArrays);
+                            foreach (var config in MyConfigs.MyWebApiToBmon)
+                            {
+                                decision = new Lib.Transport.Vendor.Bmon(new Uri(config.Server), config.StoreKey);
+                                decision.PostAsync(config.Path, momentArrays);
 
-                            Console.WriteLine(decision.Stdout);
+                                Console.WriteLine(decision.Output);
+                            }
                         }
+                        break;
+                    case UploadMethods.DoNothing:
                         break;
 
                     default:

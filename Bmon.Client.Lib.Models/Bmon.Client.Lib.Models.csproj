@@ -39,9 +39,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseDevourConfig.cs" />
-    <Compile Include="BaseUploadConfig.cs" />
-    <Compile Include="BaseMoments.cs" />
+    <Compile Include="DevourConfig.cs" />
+    <Compile Include="UploadConfig.cs" />
+    <Compile Include="Moments.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

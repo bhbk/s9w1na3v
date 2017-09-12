@@ -4,7 +4,9 @@ using ManyConsole;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using System.Xml.Serialization;
 
 namespace Bmon.Client.Cli
 {
@@ -45,7 +47,7 @@ namespace Bmon.Client.Cli
         public override int Run(string[] remainingArguments)
         {
             try
-            {
+            {                
                 Lib.Devour.DotCsv.GenericFormatA raw = new Lib.Devour.DotCsv.GenericFormatA(InputFile);
                 MomentTuples momentTuples = new MomentTuples();
                 MomentArrays momentArrays = new MomentArrays();

@@ -5,20 +5,20 @@ using System.Text;
 
 namespace Bmon.Client.Lib.Models
 {
-    public abstract class BaseMoments
+    public abstract class Moments
     {
         internal string StoreKey { get; set; }
 
-        internal BaseMoments() { }
+        internal Moments() { }
 
-        internal BaseMoments(string storekey)
+        internal Moments(string storekey)
         {
             StoreKey = storekey;
         }
     }
 
     [Serializable]
-    public class MomentArrays : BaseMoments
+    public class MomentArrays : Moments
     {
         public List<List<string>> Readings { get; set; }
 
@@ -51,7 +51,7 @@ namespace Bmon.Client.Lib.Models
     }
 
     [Serializable]
-    public class MomentTuples : BaseMoments
+    public class MomentTuples : Moments
     {
         public List<Tuple<double, string, double>> Readings { get; set; }
 
