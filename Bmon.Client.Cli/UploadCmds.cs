@@ -1,20 +1,17 @@
 ﻿using Bmon.Client.Lib.Models;
-using Bmon.Client.Lib.Transport;
 using ManyConsole;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Reflection;
-using System.Xml.Serialization;
 
 namespace Bmon.Client.Cli
 {
     public class UploadCmds : ConsoleCommand
     {
+        private Core.Config.v1_0_0_0.DevourConfig devourConfig = new Core.Config.v1_0_0_0.DevourConfig();
+        private Core.Config.v1_0_0_0.UploadConfig uploadConfig = new Core.Config.v1_0_0_0.UploadConfig();
         private UploadMethods Decide;
         private string InputFile = null;
-        private string ConfigFile = "UploadConfig.xml";
 
         public UploadCmds()
         {
@@ -52,17 +49,6 @@ namespace Bmon.Client.Cli
         {
             try
             {
-                Core.Config.v1_0_0_0.UploadConfig MyConfigs = new Core.Config.v1_0_0_0.UploadConfig();
-                MyConfigs.MyDropbox.Add(new FileToDropboxConfig("12345", "/"));
-                MyConfigs.MyFtp.Add(new FileViaFtpConfig("https://bmon.ahfc.us", new NetworkCredential("username", "password"), "/"));
-                MyConfigs.MySftp.Add(new FileViaSftpConfig("https://bmon.ahfc.us", 22, new NetworkCredential("username", "password"), "/"));
-                MyConfigs.MyTftp.Add(new FileViaTftpConfig("https://bmon.ahfc.us", "/"));
-                MyConfigs.MyWebApiToBmon.Add(new WebApiToBmonConfig("https://bmon.ahfc.us", "/readingdb/reading/store/", "12345678"));
-
-                XmlSerializer x = new XmlSerializer(MyConfigs.GetType());
-                StreamWriter writer = new StreamWriter(ConfigFile);
-                x.Serialize(writer, MyConfigs);
-
                 string localPath = new FileInfo(InputFile).DirectoryName;
                 string localName = new FileInfo(InputFile).Name;
                 string remoteName = localName;
@@ -72,7 +58,7 @@ namespace Bmon.Client.Cli
                 {
                     case UploadMethods.FileToDropbox:
                         {
-                            foreach (var config in MyConfigs.MyDropbox)
+                            foreach (var config in uploadConfig.MyDropbox)
                             {
                                 decision = new Lib.Transport.Vendor.Dropbox(config.Token);
                                 decision.UploadFileAsync(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
@@ -84,7 +70,7 @@ namespace Bmon.Client.Cli
 
                     case UploadMethods.FileViaFtp:
                         {
-                            foreach (var config in MyConfigs.MyFtp)
+                            foreach (var config in uploadConfig.MyFtp)
                             {
                                 decision = new Lib.Transport.Generic.Ftp(new Uri(config.Server), config.Credential);
                                 decision.UploadFileAsync(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
@@ -96,7 +82,7 @@ namespace Bmon.Client.Cli
 
                     case UploadMethods.FileViaSftp:
                         {
-                            foreach (var config in MyConfigs.MySftp)
+                            foreach (var config in uploadConfig.MySftp)
                             {
                                 decision = new Lib.Transport.Generic.Sftp(new Uri(config.Server), config.Port, config.Credential);
                                 decision.UploadFile(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
@@ -108,7 +94,7 @@ namespace Bmon.Client.Cli
 
                     case UploadMethods.FileViaTftp:
                         {
-                            foreach (var config in MyConfigs.MyTftp)
+                            foreach (var config in uploadConfig.MyTftp)
                             {
                                 decision = new Lib.Transport.Generic.Tftp(new Uri(config.Server));
                                 decision.UploadFile(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
@@ -130,7 +116,7 @@ namespace Bmon.Client.Cli
                             foreach (Tuple<double, string, double> t in momentTuples.Readings)
                                 momentArrays.Readings.Add(new List<string>() { t.Item1.ToString(), t.Item2.ToString(), t.Item3.ToString() });
 
-                            foreach (var config in MyConfigs.MyWebApiToBmon)
+                            foreach (var config in uploadConfig.MyWebApiToBmon)
                             {
                                 decision = new Lib.Transport.Vendor.Bmon(new Uri(config.Server), config.StoreKey);
                                 decision.PostAsync(config.Path, momentArrays);
@@ -150,7 +136,6 @@ namespace Bmon.Client.Cli
             }
             catch (Exception ex)
             {
-                Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
                 return Helpers.AngryFarewell(ex);
             }
         }

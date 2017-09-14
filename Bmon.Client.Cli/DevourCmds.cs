@@ -4,14 +4,12 @@ using ManyConsole;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Xml.Serialization;
 
 namespace Bmon.Client.Cli
 {
     public class DevourCmds : ConsoleCommand
     {
+        private Core.Config.v1_0_0_0.DevourConfig devourConfig = new Core.Config.v1_0_0_0.DevourConfig();
         private OutputFormat Format;
         private string InputFile = null;
         private bool Validate = false, Show = false;
@@ -93,7 +91,6 @@ namespace Bmon.Client.Cli
             }
             catch (Exception ex)
             {
-                Core.Echo.Proxy.Caught.Msg(Assembly.GetExecutingAssembly().GetName().Name, MethodBase.GetCurrentMethod().ToString(), ex);
                 return Helpers.AngryFarewell(ex);
             }
         }
