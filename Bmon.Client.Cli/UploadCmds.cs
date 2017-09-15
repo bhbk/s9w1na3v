@@ -37,8 +37,8 @@ namespace Bmon.Client.Cli
                 else if (arg.ToLower() == UploadMethods.WebApiToBmon.ToString().ToLower())
                     Decide = UploadMethods.WebApiToBmon;
 
-                else if (arg.ToLower() == UploadMethods.DoNothing.ToString().ToLower())
-                    Decide = UploadMethods.DoNothing;
+                else if (arg.ToLower() == UploadMethods.OnlyForInit.ToString().ToLower())
+                    Decide = UploadMethods.OnlyForInit;
 
                 else
                     throw new ConsoleHelpAsException("Invalid upload type...");
@@ -125,7 +125,7 @@ namespace Bmon.Client.Cli
                             }
                         }
                         break;
-                    case UploadMethods.DoNothing:
+                    case UploadMethods.OnlyForInit:
                         break;
 
                     default:

@@ -123,7 +123,9 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
             foreach (var config in MyDropbox)
             {
                 output.Append(typeof(Lib.Models.FileToDropboxConfig).Name + Environment.NewLine);
-                output.Append(config.Id.ToString() + Environment.NewLine);
+                output.Append("  Id:" + config.Id.ToString() + Environment.NewLine);
+                output.Append("  Token:" + config.Token.ToString() + Environment.NewLine);
+                output.Append("  Path:" + config.Path.ToString() + Environment.NewLine);
             }
 
             output.Append(Environment.NewLine);
@@ -131,7 +133,11 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
             foreach (var config in MyFtp)
             {
                 output.Append(typeof(Lib.Models.FileViaFtpConfig).Name + Environment.NewLine);
-                output.Append(config.Id.ToString() + Environment.NewLine);
+                output.Append("  Id:" + config.Id.ToString() + Environment.NewLine);
+                output.Append("  Server:" + config.Server.ToString() + Environment.NewLine);
+                output.Append("  Username:" + config.Credential.UserName.ToString() + Environment.NewLine);
+                output.Append("  Password:" + config.Credential.Password.ToString() + Environment.NewLine);
+                output.Append("  Path:" + config.Path.ToString() + Environment.NewLine);
             }
 
             output.Append(Environment.NewLine);
@@ -139,7 +145,12 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
             foreach (var config in MySftp)
             {
                 output.Append(typeof(Lib.Models.FileViaSftpConfig).Name + Environment.NewLine);
-                output.Append(config.Id.ToString() + Environment.NewLine);
+                output.Append("  Id:" + config.Id.ToString() + Environment.NewLine);
+                output.Append("  Server:" + config.Server.ToString() + Environment.NewLine);
+                output.Append("  Port:" + config.Port.ToString() + Environment.NewLine);
+                output.Append("  Username:" + config.Credential.UserName.ToString() + Environment.NewLine);
+                output.Append("  Password:" + config.Credential.Password.ToString() + Environment.NewLine);
+                output.Append("  Path:" + config.Path.ToString() + Environment.NewLine);
             }
 
             output.Append(Environment.NewLine);
@@ -147,7 +158,9 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
             foreach (var config in MyTftp)
             {
                 output.Append(typeof(Lib.Models.FileViaTftpConfig).Name + Environment.NewLine);
-                output.Append(config.Id.ToString() + Environment.NewLine);
+                output.Append("  Id:" + config.Id.ToString() + Environment.NewLine);
+                output.Append("  Server:" + config.Server.ToString() + Environment.NewLine);
+                output.Append("  Path:" + config.Path.ToString() + Environment.NewLine);
             }
 
             output.Append(Environment.NewLine);
@@ -155,7 +168,10 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
             foreach (var config in MyWebApiToBmon)
             {
                 output.Append(typeof(Lib.Models.WebApiToBmonConfig).Name + Environment.NewLine);
-                output.Append(config.Id.ToString() + Environment.NewLine);
+                output.Append("  Id:" + config.Id.ToString() + Environment.NewLine);
+                output.Append("  Server:" + config.Server.ToString() + Environment.NewLine);
+                output.Append("  StoreKey:" + config.StoreKey.ToString() + Environment.NewLine);
+                output.Append("  Path:" + config.Path.ToString() + Environment.NewLine);
             }
 
             return output.ToString();

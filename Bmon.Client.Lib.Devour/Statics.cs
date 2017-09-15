@@ -6,7 +6,8 @@ namespace Bmon.Client.Lib.Devour
     public enum OutputFormat
     {
         Csv,
-        Json
+        Json,
+        OnlyForInit
     }
 
     internal static class Statics
