@@ -42,7 +42,7 @@ namespace Bmon.Client.Lib.Transport.Vendor
             {
                 client.BaseAddress = Server;
                 client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 HttpResponseMessage response = client.PostAsJsonAsync(path, moments).Result;
 
@@ -52,21 +52,20 @@ namespace Bmon.Client.Lib.Transport.Vendor
 
         public async Task<HttpResponseMessage> PostAsync(string path, byte[] file)
         {
-            HttpContent content = new ByteArrayContent(file);
-
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-
-            using (var form = new MultipartFormDataContent())
+            using (var client = new HttpClient())
             {
-                form.Add(content);
+                HttpContent content = new ByteArrayContent(file);
+                MultipartFormDataContent mime = new MultipartFormDataContent();
 
-                using (var client = new HttpClient())
-                {
-                    client.BaseAddress = Server;
-                    HttpResponseMessage response = await client.PostAsync(path, form);
+                mime.Add(content);
 
-                    return await Task.FromResult(response);
-                }
+                client.BaseAddress = Server;
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("multipart/form-data"));
+
+                HttpResponseMessage response = client.PostAsync(path, mime).Result;
+
+                return await Task.FromResult(response);
             }
         }
     }
