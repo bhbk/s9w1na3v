@@ -10,7 +10,7 @@ namespace Bmon.Client.Cli
     public class DevourCmds : ConsoleCommand
     {
         private Core.Config.v1_0_0_0.DevourConfig devourConfig = new Core.Config.v1_0_0_0.DevourConfig();
-        private OutputFormat Format = OutputFormat.OnlyForInit;
+        private OutputFormat Format = OutputFormat.Uninitialized;
         private string InputFile = null;
         private bool Validate = false, Show = false;
 

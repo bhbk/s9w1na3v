@@ -4,28 +4,6 @@ using System.Net;
 namespace Bmon.Client.Lib.Models
 {
     [Serializable]
-    public class FileToDropboxConfig
-    {
-        public Guid Id;
-        public string Token;
-        public string Path;
-
-        public FileToDropboxConfig()
-        {
-            Id = new Guid();
-            Token = string.Empty;
-            Path = string.Empty;
-        }
-
-        public FileToDropboxConfig(string token, string path)
-        {
-            Id = Guid.NewGuid();
-            Token = token;
-            Path = path;
-        }
-    }
-
-    [Serializable]
     public class FileViaFtpConfig
     {
         public Guid Id;
@@ -100,29 +78,79 @@ namespace Bmon.Client.Lib.Models
     }
 
     [Serializable]
-    public class WebApiToBmonConfig
+    public class PostFileToDropboxConfig
+    {
+        public Guid Id;
+        public string Token;
+        public string Path;
+
+        public PostFileToDropboxConfig()
+        {
+            Id = new Guid();
+            Token = string.Empty;
+            Path = string.Empty;
+        }
+
+        public PostFileToDropboxConfig(string token, string path)
+        {
+            Id = Guid.NewGuid();
+            Token = token;
+            Path = path;
+        }
+    }
+
+    [Serializable]
+    public class PostFileToBmonConfig
+    {
+        public Guid Id;
+        public string Server;
+        public string Path;
+        public string LocalDir;
+        public string LocalFile;
+
+        public PostFileToBmonConfig()
+        {
+            Id = new Guid();
+            Server = string.Empty;
+            Path = string.Empty;
+            LocalDir = string.Empty;
+            LocalFile = string.Empty;
+        }
+
+        public PostFileToBmonConfig(string server, string path, string localDir, string localFile)
+        {
+            Id = Guid.NewGuid();
+            Server = server;
+            Path = path;
+            LocalDir = localDir;
+            LocalFile = localFile;
+        }
+    }
+
+    [Serializable]
+    public class PostJsonToBmonConfig
     {
         public Guid Id;
         public string Server;
         public string Path;
         public string StoreKey;
 
-        public WebApiToBmonConfig()
+        public PostJsonToBmonConfig()
         {
             //The "StoreKey" is part of the MomentArrays dataset. Not needed here.
             Id = new Guid();
             Server = string.Empty;
-            StoreKey = string.Empty;
             Path = string.Empty;
+            StoreKey = string.Empty;
         }
 
-        public WebApiToBmonConfig(string server, string storeKey, string path)
+        public PostJsonToBmonConfig(string server, string path, string storeKey)
         {
             //The "StoreKey" is part of the MomentArrays dataset. Not needed here.
             Id = Guid.NewGuid();
             Server = server;
-            StoreKey = storeKey;
             Path = path;
+            StoreKey = storeKey;
         }
     }
 
@@ -131,8 +159,9 @@ namespace Bmon.Client.Lib.Models
         FileViaFtp,
         FileViaSftp,
         FileViaTftp,
-        FileToDropbox,
-        WebApiToBmon,
-        OnlyForInit
+        PostFileToBmon,
+        PostFileToDropbox,
+        PostJsonToBmon,
+        Uninitialized
     }
 }

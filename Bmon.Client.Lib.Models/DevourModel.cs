@@ -3,30 +3,33 @@ using System.Collections.Generic;
 
 namespace Bmon.Client.Lib.Models
 {
-    public class LocalFileConfig
+    public class DevourModel
     {
         public Guid Id;
         public string LocalDir;
         public string LocalFile;
         public FilePattern LocalFilePattern;
         public List<Guid> UploadTo;
+        public List<Guid> TriggerOn;
 
-        public LocalFileConfig()
+        public DevourModel()
         {
             Id = new Guid();
             LocalDir = string.Empty;
             LocalFile = string.Empty;
-            LocalFilePattern = FilePattern.OnlyForInit;
+            LocalFilePattern = FilePattern.Uninitialized;
             UploadTo = new List<Guid>();
+            TriggerOn = new List<Guid>();
         }
 
-        public LocalFileConfig(string localDir, string localFile, FilePattern localFilePattern)
+        public DevourModel(string localDir, string localFile, FilePattern localFilePattern)
         {
             Id = Guid.NewGuid();
             LocalDir = localDir;
             LocalFile = localFile;
             LocalFilePattern = localFilePattern;
             UploadTo = new List<Guid>();
+            TriggerOn = new List<Guid>();
         }
     }
 
@@ -34,13 +37,13 @@ namespace Bmon.Client.Lib.Models
     {
         Absolute,
         RegEx,
-        OnlyForInit
+        Uninitialized
     }
 
     public enum FileAction
     {
         AbortIfExist,
         OverwriteIfExist,
-        OnlyForInit
+        Uninitialized
     }
 }

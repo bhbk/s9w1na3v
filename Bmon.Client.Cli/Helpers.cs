@@ -48,12 +48,28 @@ namespace Bmon.Client.Cli
                 config = (Core.Config.v1_0_0_0.DevourConfig)xs.Deserialize(sr);
         }
 
+        internal static void ReadConfig(ref Core.Config.v1_0_0_0.TriggerConfig config)
+        {
+            XmlSerializer xs = new XmlSerializer(typeof(Core.Config.v1_0_0_0.TriggerConfig));
+
+            using (StreamReader sr = new StreamReader(Core.Config.Globals.TriggerConfigFile))
+                config = (Core.Config.v1_0_0_0.TriggerConfig)xs.Deserialize(sr);
+        }
+
         internal static void ReadConfig(ref Core.Config.v1_0_0_0.UploadConfig config)
         {
             XmlSerializer xs = new XmlSerializer(typeof(Core.Config.v1_0_0_0.UploadConfig));
 
             using (StreamReader sr = new StreamReader(Core.Config.Globals.UploadConfigFile))
                 config = (Core.Config.v1_0_0_0.UploadConfig)xs.Deserialize(sr);
+        }
+
+        internal static void WriteConfig(ref Core.Config.v1_0_0_0.TriggerConfig config)
+        {
+            XmlSerializer xs = new XmlSerializer(config.GetType());
+
+            using (StreamWriter sw = new StreamWriter(Core.Config.Globals.TriggerConfigFile))
+                xs.Serialize(sw, config);
         }
 
         internal static void WriteConfig(ref Core.Config.v1_0_0_0.UploadConfig config)
@@ -74,18 +90,26 @@ namespace Bmon.Client.Cli
 
         internal static void DefaultConfig(ref Core.Config.v1_0_0_0.DevourConfig config)
         {
-            config.MyLocalFiles.Add(new LocalFileConfig(@"C:\Program Files\Bmon Client\", @"Moments.csv", FilePattern.Absolute));
+            config.MyLocalFiles.Add(new DevourModel(@"C:\Program Files\Bmon Client\", @"Moments.csv", FilePattern.Absolute));
 
             WriteConfig(ref config);
         }
-        
+
+        internal static void DefaultConfig(ref Core.Config.v1_0_0_0.TriggerConfig config)
+        {
+            config.MyTriggers.Add(new TriggerModel(@"C:\Program Files\Bmon Client\Monitor\", @"Moments.csv", TriggerModel.TriggerUpload.OnFileSystemCommit));
+
+            WriteConfig(ref config);
+        }
+
         internal static void DefaultConfig(ref Core.Config.v1_0_0_0.UploadConfig config)
         {
-            config.MyDropbox.Add(new FileToDropboxConfig("12345678", "/"));
             config.MyFtp.Add(new FileViaFtpConfig("ftp://bmon.ahfc.us", new NetworkCredential("username", "password"), "/"));
             config.MySftp.Add(new FileViaSftpConfig("sftp://bmon.ahfc.us", 22, new NetworkCredential("username", "password"), "/"));
             config.MyTftp.Add(new FileViaTftpConfig("tftp://bmon.ahfc.us", "/"));
-            config.MyWebApiToBmon.Add(new WebApiToBmonConfig("https://bmon.ahfc.us", "/readingdb/reading/store/", "12345678"));
+            config.MyPostFileToBmon.Add(new PostFileToBmonConfig("https://bmon.ahfc.us", "/file-upload/", @"C:\Program Files\Bmon Client\Monitor\", @"Moments.csv"));
+            config.MyPostFileToDropbox.Add(new PostFileToDropboxConfig("12345678", "/"));
+            config.MyPostJsonToBmon.Add(new PostJsonToBmonConfig("https://bmon.ahfc.us", "/readingdb/reading/store/", "12345678"));
 
             WriteConfig(ref config);
         }

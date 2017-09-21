@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Config\Globals.cs" />
     <Compile Include="Config\v1_0_0_0\DevourConfig.cs" />
+    <Compile Include="Config\v1_0_0_0\TriggerConfig.cs" />
     <Compile Include="Config\v1_0_0_0\UploadConfig.cs" />
     <Compile Include="Echo\Proxy.cs" />
     <Compile Include="Echo\EventLogs.cs" />
@@ -66,8 +67,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ConfigForDevour.xml" />
-    <Content Include="ConfigForUpload.xml" />
+    <Content Include="Config\v1_0_0_0\DevourConfig.xml" />
+    <Content Include="Config\v1_0_0_0\TriggerConfig.xml" />
+    <Content Include="Config\v1_0_0_0\UploadConfig.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

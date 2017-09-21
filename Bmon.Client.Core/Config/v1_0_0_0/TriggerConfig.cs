@@ -8,9 +8,9 @@ using System.Xml.Serialization;
 
 namespace Bmon.Client.Core.Config.v1_0_0_0
 {
-    public class DevourConfig : IXmlSerializable
+    public class TriggerConfig : IXmlSerializable
     {
-        public List<Lib.Models.DevourModel> MyLocalFiles = new List<Lib.Models.DevourModel>();
+        public List<Lib.Models.TriggerModel> MyTriggers = new List<Lib.Models.TriggerModel>();
 
         public XmlSchema GetSchema() { return null; }
 
@@ -19,16 +19,16 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
             try
             {
                 if (reader.MoveToContent() == XmlNodeType.Element
-                    && reader.LocalName == (typeof(Core.Config.v1_0_0_0.DevourConfig).Name)
+                    && reader.LocalName == (typeof(Core.Config.v1_0_0_0.TriggerConfig).Name)
                     && reader.GetAttribute("Version") == "1.0.0.0")
                 {
                     reader.Read();
 
                     while (reader.MoveToContent() == XmlNodeType.Element
-                        && reader.LocalName == (typeof(Lib.Models.DevourModel).Name))
+                        && reader.LocalName == (typeof(Lib.Models.TriggerModel).Name))
                     {
-                        var config = new XmlSerializer(typeof(Lib.Models.DevourModel));
-                        MyLocalFiles.Add((Lib.Models.DevourModel)config.Deserialize(reader));
+                        var config = new XmlSerializer(typeof(Lib.Models.TriggerModel));
+                        MyTriggers.Add((Lib.Models.TriggerModel)config.Deserialize(reader));
                     }
                 }
                 else
@@ -47,9 +47,9 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
             {
                 writer.WriteAttributeString("Version", "1.0.0.0");
 
-                foreach (var config in MyLocalFiles)
+                foreach (var config in MyTriggers)
                 {
-                    var thing = new XmlSerializer(typeof(Lib.Models.DevourModel));
+                    var thing = new XmlSerializer(typeof(Lib.Models.TriggerModel));
                     thing.Serialize(writer, config);
                 }
             }
@@ -64,19 +64,13 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
         {
             StringBuilder output = new StringBuilder();
 
-            foreach (var config in MyLocalFiles)
+            foreach (var config in MyTriggers)
             {
-                output.Append(typeof(Lib.Models.DevourModel).Name + Environment.NewLine);
+                output.Append(typeof(Lib.Models.TriggerModel).Name + Environment.NewLine);
                 output.Append("  Id:" + config.Id.ToString() + Environment.NewLine);
                 output.Append("  LocalDir:" + config.LocalDir.ToString() + Environment.NewLine);
                 output.Append("  LocalFile:" + config.LocalFile.ToString() + Environment.NewLine);
-                output.Append("  LocalFilePattern:" + config.LocalFilePattern.ToString() + Environment.NewLine);
-
-                foreach(Guid g in config.UploadTo)
-                    output.Append("    UploadTo:" + g.ToString() + Environment.NewLine);
-
-                foreach (Guid g in config.TriggerOn)
-                    output.Append("    TriggerOn:" + g.ToString() + Environment.NewLine);
+                output.Append("  LocalFilePattern:" + config.LocalFileTrigger.ToString() + Environment.NewLine);
             }
 
             return output.ToString();

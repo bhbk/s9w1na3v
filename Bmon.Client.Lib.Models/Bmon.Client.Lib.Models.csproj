@@ -39,9 +39,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DevourModels.cs" />
-    <Compile Include="UploadModels.cs" />
-    <Compile Include="Moments.cs" />
+    <Compile Include="DevourModel.cs" />
+    <Compile Include="TriggerModel.cs" />
+    <Compile Include="UploadModel.cs" />
+    <Compile Include="MomentModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

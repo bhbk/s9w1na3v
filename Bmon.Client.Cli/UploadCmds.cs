@@ -22,10 +22,7 @@ namespace Bmon.Client.Cli
             });
             HasRequiredOption("u|upload-type=", "Type of upload to perform.", arg =>
             {
-                if (arg.ToLower() == UploadMethods.FileToDropbox.ToString().ToLower())
-                    Decide = UploadMethods.FileToDropbox;
-
-                else if (arg.ToLower() == UploadMethods.FileViaFtp.ToString().ToLower())
+                if (arg.ToLower() == UploadMethods.FileViaFtp.ToString().ToLower())
                     Decide = UploadMethods.FileViaFtp;
 
                 else if (arg.ToLower() == UploadMethods.FileViaSftp.ToString().ToLower())
@@ -34,11 +31,17 @@ namespace Bmon.Client.Cli
                 else if (arg.ToLower() == UploadMethods.FileViaTftp.ToString().ToLower())
                     Decide = UploadMethods.FileViaTftp;
 
-                else if (arg.ToLower() == UploadMethods.WebApiToBmon.ToString().ToLower())
-                    Decide = UploadMethods.WebApiToBmon;
+                else if (arg.ToLower() == UploadMethods.PostFileToBmon.ToString().ToLower())
+                    Decide = UploadMethods.PostFileToBmon;
 
-                else if (arg.ToLower() == UploadMethods.OnlyForInit.ToString().ToLower())
-                    Decide = UploadMethods.OnlyForInit;
+                else if (arg.ToLower() == UploadMethods.PostFileToDropbox.ToString().ToLower())
+                    Decide = UploadMethods.PostFileToDropbox;
+
+                else if (arg.ToLower() == UploadMethods.PostJsonToBmon.ToString().ToLower())
+                    Decide = UploadMethods.PostJsonToBmon;
+
+                else if (arg.ToLower() == UploadMethods.Uninitialized.ToString().ToLower())
+                    Decide = UploadMethods.Uninitialized;
 
                 else
                     throw new ConsoleHelpAsException("Invalid upload type...");
@@ -56,18 +59,6 @@ namespace Bmon.Client.Cli
 
                 switch (Decide)
                 {
-                    case UploadMethods.FileToDropbox:
-                        {
-                            foreach (var config in uploadConfig.MyDropbox)
-                            {
-                                decision = new Lib.Transport.Vendor.Dropbox(config.Token);
-                                decision.UploadFileAsync(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
-
-                                Console.WriteLine(decision.Output);
-                            }
-                        }
-                        break;
-
                     case UploadMethods.FileViaFtp:
                         {
                             foreach (var config in uploadConfig.MyFtp)
@@ -104,7 +95,33 @@ namespace Bmon.Client.Cli
                         }
                         break;
 
-                    case UploadMethods.WebApiToBmon:
+                    case UploadMethods.PostFileToBmon:
+                        {
+                            foreach (var config in uploadConfig.MyPostFileToBmon)
+                            {
+                                byte[] fileBytes = File.ReadAllBytes(InputFile);
+
+                                decision = new Lib.Transport.Vendor.Bmon(new Uri(config.Server));
+                                decision.PostAsync(config.Path, fileBytes);
+
+                                Console.WriteLine(decision.Output);
+                            }
+                        }
+                        break;
+
+                    case UploadMethods.PostFileToDropbox:
+                        {
+                            foreach (var config in uploadConfig.MyPostFileToDropbox)
+                            {
+                                decision = new Lib.Transport.Vendor.Dropbox(config.Token);
+                                decision.UploadFileAsync(localPath, localName, config.Path, remoteName, FileAction.OverwriteIfExist);
+
+                                Console.WriteLine(decision.Output);
+                            }
+                        }
+                        break;
+
+                    case UploadMethods.PostJsonToBmon:
                         {
                             Lib.Devour.DotCsv.GenericFormatA raw = new Lib.Devour.DotCsv.GenericFormatA(InputFile);
                             MomentTuples momentTuples = new MomentTuples();
@@ -116,7 +133,7 @@ namespace Bmon.Client.Cli
                             foreach (Tuple<double, string, double> t in momentTuples.Readings)
                                 momentArrays.Readings.Add(new List<string>() { t.Item1.ToString(), t.Item2.ToString(), t.Item3.ToString() });
 
-                            foreach (var config in uploadConfig.MyWebApiToBmon)
+                            foreach (var config in uploadConfig.MyPostJsonToBmon)
                             {
                                 decision = new Lib.Transport.Vendor.Bmon(new Uri(config.Server), config.StoreKey);
                                 decision.PostAsync(config.Path, momentArrays);
@@ -125,7 +142,8 @@ namespace Bmon.Client.Cli
                             }
                         }
                         break;
-                    case UploadMethods.OnlyForInit:
+
+                    case UploadMethods.Uninitialized:
                         break;
 
                     default:

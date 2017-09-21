@@ -10,6 +10,7 @@ namespace Bmon.Client.Cli
     public class ConfigCmds : ConsoleCommand
     {
         private Core.Config.v1_0_0_0.DevourConfig devourConfig = new Core.Config.v1_0_0_0.DevourConfig();
+        private Core.Config.v1_0_0_0.TriggerConfig triggerConfig = new Core.Config.v1_0_0_0.TriggerConfig();
         private Core.Config.v1_0_0_0.UploadConfig uploadConfig = new Core.Config.v1_0_0_0.UploadConfig();
         private bool Read = false, Write = false, Initialize = false;
 
@@ -20,6 +21,9 @@ namespace Bmon.Client.Cli
             HasOption("i|initialize", "Initialize a configuration.", arg => { Initialize = true; });
             HasOption("r|read", "Read & display a configuration.", arg => { Read = true; });
             HasOption("w|write", "Write a configuration.", arg => { Write = true; });
+
+            //if (Read == false && Write == false && Initialize == false)
+            //    throw new ConsoleHelpAsException("stuff");
         }
 
         public override int Run(string[] remainingArguments)
@@ -29,36 +33,51 @@ namespace Bmon.Client.Cli
                 if (Initialize)
                 {
                     Helpers.DefaultConfig(ref devourConfig);
+                    Helpers.DefaultConfig(ref triggerConfig);
                     Helpers.DefaultConfig(ref uploadConfig);
 
-                    List<FileToDropboxConfig> dropboxes = uploadConfig.MyDropbox;
-                    List<WebApiToBmonConfig> bmons = uploadConfig.MyWebApiToBmon;
+                    List<PostFileToDropboxConfig> dropboxes = uploadConfig.MyPostFileToDropbox;
+                    List<PostJsonToBmonConfig> bmonJsons = uploadConfig.MyPostJsonToBmon;
+                    List<PostFileToBmonConfig> bmonFiles = uploadConfig.MyPostFileToBmon;
+                    List<TriggerModel> triggers = triggerConfig.MyTriggers;
 
-                    foreach (LocalFileConfig file in devourConfig.MyLocalFiles)
+                    foreach (DevourModel devour in devourConfig.MyLocalFiles)
                     {
-                        foreach (FileToDropboxConfig dropbox in dropboxes)
-                            file.UploadTo.Add(dropbox.Id);
+                        foreach (PostFileToDropboxConfig file in dropboxes)
+                            devour.UploadTo.Add(file.Id);
 
-                        foreach (WebApiToBmonConfig bmon in bmons)
-                            file.UploadTo.Add(bmon.Id);
+                        foreach (PostJsonToBmonConfig json in bmonJsons)
+                            devour.UploadTo.Add(json.Id);
+
+                        foreach (PostFileToBmonConfig file in bmonFiles)
+                            devour.UploadTo.Add(file.Id);
+
+                        foreach (TriggerModel trigger in triggers)
+                            devour.TriggerOn.Add(trigger.Id);
                     }
 
                     Helpers.WriteConfig(ref devourConfig);
+                    Helpers.WriteConfig(ref triggerConfig);
+                    Helpers.WriteConfig(ref uploadConfig);
                 }
                 else if (Read)
                 {
                     Helpers.ReadConfig(ref devourConfig);
+                    Helpers.ReadConfig(ref triggerConfig);
                     Helpers.ReadConfig(ref uploadConfig);
 
                     Console.WriteLine(devourConfig.ToString());
+                    Console.WriteLine(triggerConfig.ToString());
                     Console.WriteLine(uploadConfig.ToString());
                 }
                 else if (Write)
                 {
                     Helpers.WriteConfig(ref devourConfig);
+                    Helpers.WriteConfig(ref triggerConfig);
                     Helpers.WriteConfig(ref uploadConfig);
 
                     Console.WriteLine(devourConfig.ToString());
+                    Console.WriteLine(triggerConfig.ToString());
                     Console.WriteLine(uploadConfig.ToString());
                 }
 

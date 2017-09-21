@@ -7,7 +7,7 @@ namespace Bmon.Client.Lib.Devour
     {
         Csv,
         Json,
-        OnlyForInit
+        Uninitialized
     }
 
     internal static class Statics
