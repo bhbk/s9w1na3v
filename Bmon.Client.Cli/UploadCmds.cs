@@ -130,8 +130,8 @@ namespace Bmon.Client.Cli
 
                             Console.WriteLine(raw.Output);
 
-                            foreach (Tuple<double, string, double> t in momentTuples.Readings)
-                                momentArrays.Readings.Add(new List<string>() { t.Item1.ToString(), t.Item2.ToString(), t.Item3.ToString() });
+                            foreach (Tuple<double, string, double> moment in momentTuples.Readings)
+                                momentArrays.Readings.Add(new List<string>() { moment.Item1.ToString(), moment.Item2.ToString(), moment.Item3.ToString() });
 
                             foreach (var config in uploadConfig.MyPostJsonToBmon)
                             {

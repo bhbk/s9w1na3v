@@ -9,5 +9,6 @@ namespace Bmon.Client.Lib.Devour.DotXml
 {
     public class GenericFormatA
     {
+
     }
 }

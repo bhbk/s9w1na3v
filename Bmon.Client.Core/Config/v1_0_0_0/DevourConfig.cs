@@ -72,7 +72,7 @@ namespace Bmon.Client.Core.Config.v1_0_0_0
                 output.Append("  LocalFile:" + config.LocalFile.ToString() + Environment.NewLine);
                 output.Append("  LocalFilePattern:" + config.LocalFilePattern.ToString() + Environment.NewLine);
 
-                foreach(Guid g in config.UploadTo)
+                foreach (Guid g in config.UploadTo)
                     output.Append("    UploadTo:" + g.ToString() + Environment.NewLine);
 
                 foreach (Guid g in config.TriggerOn)

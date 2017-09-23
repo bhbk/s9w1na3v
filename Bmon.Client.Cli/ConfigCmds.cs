@@ -36,23 +36,23 @@ namespace Bmon.Client.Cli
                     Helpers.DefaultConfig(ref triggerConfig);
                     Helpers.DefaultConfig(ref uploadConfig);
 
+                    List<PostFileToBmonConfig> basFiles = uploadConfig.MyPostFileToBmon;
                     List<PostFileToDropboxConfig> dropboxes = uploadConfig.MyPostFileToDropbox;
-                    List<PostJsonToBmonConfig> bmonJsons = uploadConfig.MyPostJsonToBmon;
-                    List<PostFileToBmonConfig> bmonFiles = uploadConfig.MyPostFileToBmon;
-                    List<TriggerModel> triggers = triggerConfig.MyTriggers;
+                    List<PostJsonToBmonConfig> bmonMoments = uploadConfig.MyPostJsonToBmon;
+                    List<TriggerModel> uploadTriggers = triggerConfig.MyTriggers;
 
                     foreach (DevourModel devour in devourConfig.MyLocalFiles)
                     {
+                        foreach (PostFileToBmonConfig file in basFiles)
+                            devour.UploadTo.Add(file.Id);
+
                         foreach (PostFileToDropboxConfig file in dropboxes)
                             devour.UploadTo.Add(file.Id);
 
-                        foreach (PostJsonToBmonConfig json in bmonJsons)
+                        foreach (PostJsonToBmonConfig json in bmonMoments)
                             devour.UploadTo.Add(json.Id);
 
-                        foreach (PostFileToBmonConfig file in bmonFiles)
-                            devour.UploadTo.Add(file.Id);
-
-                        foreach (TriggerModel trigger in triggers)
+                        foreach (TriggerModel trigger in uploadTriggers)
                             devour.TriggerOn.Add(trigger.Id);
                     }
 
